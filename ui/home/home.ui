@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>homeWindow</class>
+ <widget class="QWidget" name="homeWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1077</width>
+    <height>604</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Home</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(250, 250, 250)</string>
+  </property>
+  <layout class="QHBoxLayout" name="homeWindowLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
+    <number>15</number>
+   </property>
+   <property name="topMargin">
+    <number>15</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>15</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="sidebar" native="true">
+     <property name="styleSheet">
+      <string notr="true">QWidget {
+	background-color: #0e273c;
+	color: #fff;
+	border-radius: 20px;
+}
+
+QPushButton {
+	padding: 5px;
+}
+
+</string>
+     </property>
+     <layout class="QVBoxLayout" name="sidebarLayout" stretch="0,1,0">
+      <property name="spacing">
+       <number>15</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <property name="leftMargin">
+       <number>15</number>
+      </property>
+      <property name="rightMargin">
+       <number>15</number>
+      </property>
+      <item alignment="Qt::AlignLeft|Qt::AlignTop">
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <family>MV Boli</family>
+          <pointsize>30</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+	padding:10px;
+	border: 4px solid rgba(0, 0, 0, 0);
+	border-bottom-color: #fff;
+	border-radius: 0px;
+	text-align: center
+}</string>
+        </property>
+        <property name="text">
+         <string>nyTranoko</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="settingsWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget{	
+	background-color: rgba(0, 0, 0, 0);
+	border-radius: 20px;
+}
+
+QPushButton {
+	border: 2px solid rgba(0, 0, 0, 0);
+	background-color: rbga(0, 0, 0, 0);
+	border-radius: none;
+	outline: none;
+	text-align: left
+}
+QPushButton:hover {
+    border: 2px solid rgba(0, 0, 0, 0);
+	outline: none;
+	border-bottom-color: rgb(255, 159, 3);
+	color:  rgb(255, 159, 3);
+
+}</string>
+        </property>
+        <layout class="QVBoxLayout" name="settingsWidgetLayout" stretch="0,0,0,0">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>10</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="dashBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>Dashboard</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../resources/icons/dashboard.png</normaloff>../../resources/icons/dashboard.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="controlBtn">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>Control</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../resources/icons/energy-system.png</normaloff>../../resources/icons/energy-system.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="profileBtn">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>Profile</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../resources/icons/profile.png</normaloff>../../resources/icons/profile.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="emptyLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignBottom">
+       <widget class="QWidget" name="quitWidget" native="true">
+        <property name="styleSheet">
+         <string notr="true">QWidget {
+	background-color: rgba(0, 0, 0, 0);
+	border-radius: 20px;
+	color: #fff;
+}
+
+QPushButton {
+	border: 2px solid rgba(0, 0, 0, 0);
+	background-color: rbga(0, 0, 0, 0);
+	border-radius: none;
+	outline: none;
+}
+
+QPushButton:hover {
+	
+	color: rgb(255, 159, 3);
+}</string>
+        </property>
+        <layout class="QVBoxLayout" name="quitWidgetLayout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>10</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+         <item alignment="Qt::AlignLeft">
+          <widget class="QPushButton" name="logoutBtn">
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>16</pointsize>
+             <weight>75</weight>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>Déconnexion</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../resources/icons/check-out.png</normaloff>../../resources/icons/check-out.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignLeft">
+          <widget class="QPushButton" name="quitBtn">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>Quitter</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../resources/icons/switch.png</normaloff>../../resources/icons/switch.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="mainWidget">
+     <property name="styleSheet">
+      <string notr="true">QStackedWidget &gt; QWidget &gt; QLabel {
+	padding-top: 40px;
+	background-color: rgba(0, 0, 0, 0);
+	color: #0e273c;
+}
+</string>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="dashboard">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <layout class="QVBoxLayout" name="dashboardLayout" stretch="0,0">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="dashboardTitle">
+         <property name="font">
+          <font>
+           <pointsize>20</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>DASHBOARD</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <widget class="QWidget" name="scrollAreaContainer">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>787</width>
+            <height>501</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="scrollAreaContainerLayout">
+           <item row="0" column="0">
+            <widget class="QWidget" name="dashboardContainer" native="true">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <layout class="QGridLayout" name="dashboardContainerLayout" rowstretch="0">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <property name="spacing">
+               <number>10</number>
+              </property>
+              <item row="0" column="0" alignment="Qt::AlignLeft|Qt::AlignTop">
+               <widget class="QWidget" name="content_1" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>300</width>
+                  <height>300</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>300</width>
+                  <height>300</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QWidget {
+	background-color: rgb(48, 108, 149);
+	border-radius: 20px;
+}
+
+QWidget QLabel {
+	color: #fff;
+}</string>
+                </property>
+                <layout class="QVBoxLayout" name="content_1_layout">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="content_1_title">
+                   <property name="font">
+                    <font>
+                     <pointsize>20</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Cuisine</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="temperature_1_widget" native="true">
+                   <layout class="QHBoxLayout" name="temperature_1_widget_layout" stretch="0,1,1">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="temperature_1_icon">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>../../resources/icons/thermometer.png</normaloff>../../resources/icons/thermometer.png</iconset>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>56</width>
+                        <height>56</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="temperature_1">
+                      <property name="font">
+                       <font>
+                        <pointsize>16</pointsize>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Temperature :</string>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="temperature_1_value">
+                      <property name="font">
+                       <font>
+                        <pointsize>16</pointsize>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">background-color: rgb(250, 250, 250);
+margin: 20px 0px;
+color: rgb(255, 0, 0)</string>
+                      </property>
+                      <property name="text">
+                       <string>29* C</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="light_1_widget" native="true">
+                   <layout class="QHBoxLayout" name="light_1_widget_layout" stretch="0,1,0">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item alignment="Qt::AlignLeft">
+                     <widget class="QPushButton" name="light_1_icon">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>../../resources/icons/lamp.png</normaloff>../../resources/icons/lamp.png</iconset>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>56</width>
+                        <height>56</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignLeft">
+                     <widget class="QLabel" name="light_1">
+                      <property name="font">
+                       <font>
+                        <pointsize>16</pointsize>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Lumière</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="light_1_switch">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>../../resources/icons/switch-on.png</normaloff>../../resources/icons/switch-on.png</iconset>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>64</width>
+                        <height>64</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="control">
+      <layout class="QVBoxLayout" name="controlLayout" stretch="0,1">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item alignment="Qt::AlignTop">
+        <widget class="QLabel" name="controlTitle">
+         <property name="font">
+          <font>
+           <pointsize>20</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>CONTROL</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="profile">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <layout class="QVBoxLayout" name="profileLayout" stretch="0,1">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item alignment="Qt::AlignTop">
+        <widget class="QLabel" name="profileTitle">
+         <property name="font">
+          <font>
+           <pointsize>20</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>PROFILE</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_3" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
