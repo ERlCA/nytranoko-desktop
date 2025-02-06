@@ -1,28 +1,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_DashboardContent(QtWidgets.QWidget):
+class ControlContent(QtWidgets.QWidget):
     def __init__(self, title="Room", parent=None):
         super().__init__(parent)
-        self.setupUi(title)
+        self.setup(title)
 
-    def setupUi(self, title):
-        self.setObjectName("dashboardContent")
-        self.resize(300, 300)
-        self.setMinimumSize(QtCore.QSize(300, 300))
-        self.setMaximumSize(QtCore.QSize(300, 300))
-        self.setStyleSheet(
-            "QWidget {\n"
-            "    background-color: rgb(48, 108, 149);\n"
-            "    color: #fff;\n"
-            "    border: none;\n"
-            "}\n"
-            "\n"
-        )
+    def setup(self, title):
+        self.setObjectName("controlContent")
 
-        self.dashboardContentLayout = QtWidgets.QVBoxLayout(self)
-        self.dashboardContentLayout.setSpacing(0)
-        self.dashboardContentLayout.setObjectName("dashboardContentLayout")
+        self.controlContentLayout = QtWidgets.QVBoxLayout(self)
+        self.controlContentLayout.setSpacing(0)
+        self.controlContentLayout.setObjectName("controlContentLayout")
 
         # title
         self.title = QtWidgets.QLabel(title, self)
@@ -31,7 +20,7 @@ class Ui_DashboardContent(QtWidgets.QWidget):
         self.title.setFont(font)
         self.title.setAlignment(QtCore.Qt.AlignCenter)
         self.title.setObjectName("title")
-        self.dashboardContentLayout.addWidget(self.title)
+        self.controlContentLayout.addWidget(self.title)
 
         # temperature
         self.temperatureWidget = QtWidgets.QWidget(self)
@@ -45,7 +34,7 @@ class Ui_DashboardContent(QtWidgets.QWidget):
         temperatureIcon = QtGui.QIcon()
         temperatureIcon.addPixmap(
             QtGui.QPixmap(
-                ".\\ui\\dashboardContent\\..//../resources/icons/thermometer.png"
+                ".\\ui\\controlContent\\..//../resources/icons/thermometer.png"
             ),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off,
@@ -90,7 +79,7 @@ class Ui_DashboardContent(QtWidgets.QWidget):
         self.temperatureWidgetLayout.setStretch(1, 1)
         self.temperatureWidgetLayout.setStretch(2, 1)
 
-        self.dashboardContentLayout.addWidget(self.temperatureWidget)
+        self.controlContentLayout.addWidget(self.temperatureWidget)
 
         # light widget
         self.lightWidget = QtWidgets.QWidget(self)
@@ -102,7 +91,7 @@ class Ui_DashboardContent(QtWidgets.QWidget):
 
         lightIcon = QtGui.QIcon()
         lightIcon.addPixmap(
-            QtGui.QPixmap(".\\ui\\dashboardContent\\..//../resources/icons/lamp.png"),
+            QtGui.QPixmap(".\\ui\\controlContent\\..//../resources/icons/lamp.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off,
         )
@@ -126,7 +115,7 @@ class Ui_DashboardContent(QtWidgets.QWidget):
         lightSwitchIcon = QtGui.QIcon()
         lightSwitchIcon.addPixmap(
             QtGui.QPixmap(
-                ".\\ui\\dashboardContent\\..//../resources/icons/switch-on.png"
+                ".\\ui\\controlContent\\..//../resources/icons/switch-on.png"
             ),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off,
@@ -139,7 +128,7 @@ class Ui_DashboardContent(QtWidgets.QWidget):
         self.lightWidgetLayout.addWidget(self.lightSwitch)
         self.lightWidgetLayout.setStretch(1, 1)
 
-        self.dashboardContentLayout.addWidget(self.lightWidget)
+        self.controlContentLayout.addWidget(self.lightWidget)
 
 
 if __name__ == "__main__":

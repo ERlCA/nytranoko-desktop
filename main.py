@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5 import QtCore, QtGui
 from ui.login.login_ui import Ui_loginWindow
 from ui.home.home_ui import Ui_homeWindow
-from ui.dashboardContent.dashboardContent import Ui_Form
 
 
 class MainWindow(QMainWindow):
