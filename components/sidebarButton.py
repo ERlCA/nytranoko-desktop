@@ -26,3 +26,7 @@ class Button(QPushButton):
         )
         self.setIcon(icon)
         self.setIconSize(QtCore.QSize(32, 32))
+
+
+if __name__ == "__main__":
+    pass

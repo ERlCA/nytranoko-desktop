@@ -85,3 +85,7 @@ class ControlPage(qtw.QWidget):
             self.containerLayout.addWidget(
                 wrapper, row, column, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
             )
+
+
+if __name__ == "__main__":
+    pass
