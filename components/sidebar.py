@@ -1,9 +1,12 @@
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 from components.sidebarButton import Button
+from components.popUp import CloseAppWidget
 
 
 class Sidebar(QWidget):
+    logout_requested = QtCore.pyqtSignal()
+
     def __init__(self, parent=None, callback=None):
         super().__init__(parent)
         self.setup()
@@ -117,10 +120,10 @@ class Sidebar(QWidget):
         self.quitWidgetLayout.setObjectName("quitWidgetLayout")
 
         # logout and quit button
-        logoutButton = Button("Déconnexion", "logout")
-        quitButton = Button(
-            "Quitter", "quit", callback=QtCore.QCoreApplication.instance().quit
+        logoutButton = Button(
+            "Déconnexion", "logout", callback=self.showLogoutAppWidget
         )
+        quitButton = Button("Quitter", "quit", callback=self.showCloseAppWidget)
 
         font = QtGui.QFont()
         font.setFamily("MS Shell Dlg 2")
@@ -136,6 +139,19 @@ class Sidebar(QWidget):
 
         self.sidebarLayout.addWidget(self.quitWidget, 0, QtCore.Qt.AlignBottom)
         self.sidebarLayout.setStretch(1, 1)
+
+    def showCloseAppWidget(self):
+        closeAppWidget = CloseAppWidget()
+        result = closeAppWidget.exec_()
+        if result == QtWidgets.QDialog.Accepted:
+            QtWidgets.qApp.quit()
+
+    def showLogoutAppWidget(self):
+        message = "Voulez-vous vous déconnecter?"
+        logoutAppWidget = CloseAppWidget(message)
+        result = logoutAppWidget.exec_()
+        if result == QtWidgets.QDialog.Accepted:
+            self.logout_requested.emit()
 
 
 if __name__ == "__main__":

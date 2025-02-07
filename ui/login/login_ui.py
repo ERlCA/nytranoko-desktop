@@ -15,9 +15,7 @@ class Ui_loginWindow(object):
     def setupUi(self, loginWindow):
         loginWindow.setObjectName("loginWindow")
         loginWindow.resize(650, 500)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(loginWindow.sizePolicy().hasHeightForWidth())
@@ -27,61 +25,54 @@ class Ui_loginWindow(object):
         font = QtGui.QFont()
         font.setPointSize(11)
         loginWindow.setFont(font)
-        loginWindow.setStyleSheet(
-            "#leftWidget {\n"
-            "    background-color: #0e273c\n"
-            "}\n"
-            "\n"
-            "#formWidget {\n"
-            "    background-color: rgb(252, 252, 252)\n"
-            "}\n"
-            "\n"
-            "QLineEdit {\n"
-            "background: #00000000;\n"
-            "border: 2px solid rgba(0, 0, 0, 0);\n"
-            "border-bottom-color: rgba(0, 0, 0, 200);\n"
-            "color: #000;\n"
-            "padding: 10px;\n"
-            "}\n"
-            "\n"
-            "QLineEdit:hover {\n"
-            "    border-bottom-color: #fa8334;\n"
-            "}\n"
-            "\n"
-            "QLineEdit:focus {\n"
-            "    border-bottom-color: rgb(255, 159, 3);\n"
-            "    outline: none;\n"
-            "}\n"
-            "\n"
-            "QPushButton {\n"
-            "  color: rbg(0, 0, 0, 200)\n"
-            "}\n"
-            "\n"
-            "QPushButton:hover {\n"
-            "    background-color: rgb(255, 159, 3);\n"
-            "    color: #fff;\n"
-            "    outline: none;\n"
-            "    border: none\n"
-            "}\n"
-            "\n"
-            "QPushButton:pressed {\n"
-            "    background-color: #fa8334;\n"
-            "    color: rgb(231, 231, 231);\n"
-            "    border: 2px solid rgba(0, 0, 0, 0);\n"
-            "}\n"
-            "\n"
-            "QPushButton#quitBtn {\n"
-            "   border: none;\n"
-            "   background-color: rbga(0, 0, 0, 0);\n"
-            "   height: 50px;\n"
-            "   width: 40px;\n"
-            "   border-radius: 20px\n"
-            "}\n"
-            "\n"
-            "QPushButton#quitBtn:hover {\n"
-            "   background-color: rgb(255, 159, 3)\n"
-            "}\n"
-        )
+        loginWindow.setStyleSheet("#leftWidget {\n"
+"    background-color: #0e273c\n"
+"}\n"
+"\n"
+"#formWidget {\n"
+"    background-color: rgb(252, 252, 252)\n"
+"}\n"
+"\n"
+"QLineEdit {\n"
+"background: #00000000;\n"
+"border: 2px solid rgba(0, 0, 0, 0);\n"
+"border-bottom-color: rgba(0, 0, 0, 200);\n"
+"color: #000;\n"
+"padding: 10px;\n"
+"}\n"
+"\n"
+"QLineEdit:hover {\n"
+"    border-bottom-color: #fa8334;\n"
+"}\n"
+"\n"
+"QLineEdit:focus {\n"
+"    border-bottom-color: rgb(255, 159, 3);\n"
+"}\n"
+"\n"
+"QPushButton#loginBtn {\n"
+"  color: rbg(0, 0, 0, 200)\n"
+"}\n"
+"\n"
+"QPushButton#quitBtn {\n"
+"    padding: 0 5px;\n"
+"    border-radius: 50px;\n"
+"    background-color: rgba(0, 0, 0, 0);\n"
+"}\n"
+"\n"
+"\n"
+"QPushButton#loginBtn:hover, QPushButton#quitBtn:hover {\n"
+"    background-color: rgb(255, 159, 3);\n"
+"    color: #fff;\n"
+"    border: none\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: #fa8334;\n"
+"    color: rgb(231, 231, 231);\n"
+"    border: 2px solid rgba(0, 0, 0, 0);\n"
+"}\n"
+"\n"
+"")
         self.gridLayout = QtWidgets.QGridLayout(loginWindow)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setSpacing(0)
@@ -112,9 +103,7 @@ class Ui_loginWindow(object):
         font.setWeight(75)
         self.descLabel.setFont(font)
         self.descLabel.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.descLabel.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.descLabel.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.descLabel.setWordWrap(True)
         self.descLabel.setIndent(-1)
         self.descLabel.setObjectName("descLabel")
@@ -126,12 +115,18 @@ class Ui_loginWindow(object):
         self.leftLayout.setStretch(2, 1)
         self.gridLayout.addWidget(self.leftWidget, 0, 0, 1, 1)
         self.formWidget = QtWidgets.QWidget(loginWindow)
-        self.formWidget.setStyleSheet("")
+        self.formWidget.setStyleSheet("QLabel#loginLabel {\n"
+"    color: rbg(0, 0, 0, 200)\n"
+"}\n"
+"\n"
+"QLabel#errorLabel {\n"
+"    color: rgb(252, 252,252)\n"
+"}")
         self.formWidget.setObjectName("formWidget")
-        self.formLayout = QtWidgets.QVBoxLayout(self.formWidget)
-        self.formLayout.setContentsMargins(25, 70, 25, 20)
-        self.formLayout.setSpacing(57)
-        self.formLayout.setObjectName("formLayout")
+        self.formWidgetLayout = QtWidgets.QVBoxLayout(self.formWidget)
+        self.formWidgetLayout.setContentsMargins(25, 70, 25, 15)
+        self.formWidgetLayout.setSpacing(10)
+        self.formWidgetLayout.setObjectName("formWidgetLayout")
         self.loginLabel = QtWidgets.QLabel(self.formWidget)
         font = QtGui.QFont()
         font.setPointSize(20)
@@ -140,27 +135,39 @@ class Ui_loginWindow(object):
         self.loginLabel.setFont(font)
         self.loginLabel.setStyleSheet("color: rbg(0, 0, 0, 200)")
         self.loginLabel.setObjectName("loginLabel")
-        self.formLayout.addWidget(
-            self.loginLabel, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
-        )
-        self.usernameEntry = QtWidgets.QLineEdit(self.formWidget)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.usernameEntry.setFont(font)
-        self.usernameEntry.setStyleSheet("")
-        self.usernameEntry.setObjectName("usernameEntry")
-        self.formLayout.addWidget(self.usernameEntry, 0, QtCore.Qt.AlignTop)
-        self.passwordEntry = QtWidgets.QLineEdit(self.formWidget)
+        self.formWidgetLayout.addWidget(self.loginLabel, 0, QtCore.Qt.AlignTop)
+        self.entryWidget = QtWidgets.QWidget(self.formWidget)
+        self.entryWidget.setObjectName("entryWidget")
+        self.entryWidgetLayout = QtWidgets.QVBoxLayout(self.entryWidget)
+        self.entryWidgetLayout.setContentsMargins(0, 0, 0, 0)
+        self.entryWidgetLayout.setSpacing(30)
+        self.entryWidgetLayout.setObjectName("entryWidgetLayout")
+        self.passwordEntry = QtWidgets.QLineEdit(self.entryWidget)
         font = QtGui.QFont()
         font.setPointSize(10)
         self.passwordEntry.setFont(font)
         self.passwordEntry.setStyleSheet("")
         self.passwordEntry.setObjectName("passwordEntry")
-        self.formLayout.addWidget(self.passwordEntry)
-        self.loginBtn = QtWidgets.QPushButton(self.formWidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        self.entryWidgetLayout.addWidget(self.passwordEntry)
+        self.usernameEntry = QtWidgets.QLineEdit(self.entryWidget)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.usernameEntry.setFont(font)
+        self.usernameEntry.setStyleSheet("")
+        self.usernameEntry.setObjectName("usernameEntry")
+        self.entryWidgetLayout.addWidget(self.usernameEntry)
+        self.formWidgetLayout.addWidget(self.entryWidget, 0, QtCore.Qt.AlignBottom)
+        self.errorLabel = QtWidgets.QLabel(self.formWidget)
+        self.errorLabel.setObjectName("errorLabel")
+        self.formWidgetLayout.addWidget(self.errorLabel, 0, QtCore.Qt.AlignTop)
+        self.buttonWidget = QtWidgets.QWidget(self.formWidget)
+        self.buttonWidget.setObjectName("buttonWidget")
+        self.buttonWidgetLayout = QtWidgets.QVBoxLayout(self.buttonWidget)
+        self.buttonWidgetLayout.setContentsMargins(0, 0, 0, 0)
+        self.buttonWidgetLayout.setSpacing(20)
+        self.buttonWidgetLayout.setObjectName("buttonWidgetLayout")
+        self.loginBtn = QtWidgets.QPushButton(self.buttonWidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.loginBtn.sizePolicy().hasHeightForWidth())
@@ -176,55 +183,47 @@ class Ui_loginWindow(object):
         self.loginBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.loginBtn.setStyleSheet("")
         self.loginBtn.setObjectName("loginBtn")
-        self.formLayout.addWidget(self.loginBtn)
-        self.quitBtn = QtWidgets.QPushButton(self.formWidget)
+        self.buttonWidgetLayout.addWidget(self.loginBtn)
+        self.quitBtn = QtWidgets.QPushButton(self.buttonWidget)
         self.quitBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.quitBtn.setStyleSheet("QPushButton {\n"
+"    border: none;\n"
+"    height: 50px;\n"
+"    width: 40px;\n"
+"    border-radius: 20px;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"}")
         self.quitBtn.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(".\\ui\\login\\../../resources/icons/power-button.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off,
-        )
+        icon.addPixmap(QtGui.QPixmap(".\\ui\\login\\../../resources/icons/power-button.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.quitBtn.setIcon(icon)
         self.quitBtn.setIconSize(QtCore.QSize(36, 36))
         self.quitBtn.setObjectName("quitBtn")
-        self.formLayout.addWidget(
-            self.quitBtn, 0, QtCore.Qt.AlignRight | QtCore.Qt.AlignBottom
-        )
-        self.formLayout.setStretch(1, 1)
-        self.formLayout.setStretch(2, 1)
-        self.formLayout.setStretch(3, 1)
-        self.formLayout.setStretch(4, 1)
+        self.buttonWidgetLayout.addWidget(self.quitBtn, 0, QtCore.Qt.AlignRight)
+        self.formWidgetLayout.addWidget(self.buttonWidget, 0, QtCore.Qt.AlignBottom)
+        self.formWidgetLayout.setStretch(1, 1)
+        self.formWidgetLayout.setStretch(3, 1)
         self.gridLayout.addWidget(self.formWidget, 0, 1, 1, 1)
 
         self.retranslateUi(loginWindow)
         QtCore.QMetaObject.connectSlotsByName(loginWindow)
 
-        self.quitBtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-        self.loginBtn.clicked.connect(lambda: print("connect"))
-
     def retranslateUi(self, loginWindow):
         _translate = QtCore.QCoreApplication.translate
         loginWindow.setWindowTitle(_translate("loginWindow", "Se connecter"))
         self.titleLabel.setText(_translate("loginWindow", "nyTranoko"))
-        self.descLabel.setText(
-            _translate(
-                "loginWindow",
-                '"Faites confiance à nytranoko pour la sécurité de votre maison."',
-            )
-        )
+        self.descLabel.setText(_translate("loginWindow", "\"Faites confiance à nytranoko pour la sécurité de votre maison.\""))
         self.loginLabel.setText(_translate("loginWindow", "Se connecter"))
-        self.usernameEntry.setPlaceholderText(
-            _translate("loginWindow", "Nom d'utilisateur")
-        )
         self.passwordEntry.setPlaceholderText(_translate("loginWindow", "Mot de passe"))
+        self.usernameEntry.setPlaceholderText(_translate("loginWindow", "Nom d\'utilisateur"))
+        self.errorLabel.setText(_translate("loginWindow", "Nom d\'utilisateur ou mot de passe incorrect"))
         self.loginBtn.setText(_translate("loginWindow", "Connexion"))
 
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     loginWindow = QtWidgets.QWidget()
     ui = Ui_loginWindow()

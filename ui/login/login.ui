@@ -61,11 +61,18 @@ QLineEdit:focus {
 	border-bottom-color: rgb(255, 159, 3);
 }
 
-QPushButton {
+QPushButton#loginBtn {
   color: rbg(0, 0, 0, 200)
 }
 
-QPushButton:hover {
+QPushButton#quitBtn {
+	padding: 0 5px;
+	border-radius: 50px;
+	background-color: rgba(0, 0, 0, 0);
+}
+
+
+QPushButton#loginBtn:hover, QPushButton#quitBtn:hover {
 	background-color: rgb(255, 159, 3);
 	color: #fff;
     border: none
@@ -75,7 +82,9 @@ QPushButton:pressed {
 	background-color: #fa8334;
 	color: rgb(231, 231, 231);
 	border: 2px solid rgba(0, 0, 0, 0);
-}</string>
+}
+
+</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -182,11 +191,17 @@ QPushButton:pressed {
    <item row="0" column="1">
     <widget class="QWidget" name="formWidget" native="true">
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">QLabel#loginLabel {
+	color: rbg(0, 0, 0, 200)
+}
+
+QLabel#errorLabel {
+	color: rgb(252, 252,252)
+}</string>
      </property>
-     <layout class="QVBoxLayout" name="formLayout" stretch="0,1,1,1,1">
+     <layout class="QVBoxLayout" name="formWidgetLayout" stretch="0,1,0,1">
       <property name="spacing">
-       <number>57</number>
+       <number>10</number>
       </property>
       <property name="leftMargin">
        <number>25</number>
@@ -198,9 +213,9 @@ QPushButton:pressed {
        <number>25</number>
       </property>
       <property name="bottomMargin">
-       <number>20</number>
+       <number>15</number>
       </property>
-      <item alignment="Qt::AlignLeft|Qt::AlignTop">
+      <item alignment="Qt::AlignTop">
        <widget class="QLabel" name="loginLabel">
         <property name="font">
          <font>
@@ -220,104 +235,158 @@ QPushButton:pressed {
         </property>
        </widget>
       </item>
+      <item alignment="Qt::AlignBottom">
+       <widget class="QWidget" name="entryWidget" native="true">
+        <layout class="QVBoxLayout" name="entryWidgetLayout">
+         <property name="spacing">
+          <number>30</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="passwordEntry">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="placeholderText">
+            <string>Mot de passe</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="usernameEntry">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="placeholderText">
+            <string>Nom d'utilisateur</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
       <item alignment="Qt::AlignTop">
-       <widget class="QLineEdit" name="usernameEntry">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="placeholderText">
-         <string>Nom d'utilisateur</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="passwordEntry">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="placeholderText">
-         <string>Mot de passe</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="loginBtn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>16</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
+       <widget class="QLabel" name="errorLabel">
         <property name="text">
-         <string>Connexion</string>
+         <string>Nom d'utilisateur ou mot de passe incorrect</string>
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignRight|Qt::AlignBottom">
-       <widget class="QPushButton" name="quitBtn">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border: none;
-height: 50px;
-width: 40px;
-border-radius: 20px</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../../resources/icons/power-button.png</normaloff>../../resources/icons/power-button.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>36</width>
-          <height>36</height>
-         </size>
-        </property>
+      <item alignment="Qt::AlignBottom">
+       <widget class="QWidget" name="buttonWidget" native="true">
+        <layout class="QVBoxLayout" name="buttonWidgetLayout">
+         <property name="spacing">
+          <number>20</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="loginBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>Connexion</string>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignRight">
+          <widget class="QPushButton" name="quitBtn">
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+	border: none;
+	height: 50px;
+	width: 40px;
+	border-radius: 20px;
+}
+
+QPushButton:hover{
+}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../resources/icons/power-button.png</normaloff>../../resources/icons/power-button.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

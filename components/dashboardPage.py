@@ -27,3 +27,7 @@ class DashboardPage(qtw.QWidget):
         self.container.setObjectName("container")
 
         self.mainLayout.addWidget(self.container, 1)
+
+
+if __name__ == "__main__":
+    pass
