@@ -2,11 +2,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class ControlContent(QtWidgets.QWidget):
-    def __init__(self, title="Room", parent=None):
+    def __init__(self, room="Room", parent=None):
         super().__init__(parent)
-        self.setup(title)
+        self.setup(room)
 
-    def setup(self, title):
+    def setup(self, room):
         self.setObjectName("controlContent")
 
         self.controlContentLayout = QtWidgets.QVBoxLayout(self)
@@ -14,7 +14,8 @@ class ControlContent(QtWidgets.QWidget):
         self.controlContentLayout.setObjectName("controlContentLayout")
 
         # title
-        self.title = QtWidgets.QLabel(title, self)
+        roomName = " ".join(room.split("_")).lower().capitalize()
+        self.title = QtWidgets.QLabel(str(roomName), self)
         font = QtGui.QFont()
         font.setPointSize(20)
         self.title.setFont(font)
@@ -125,6 +126,7 @@ class ControlContent(QtWidgets.QWidget):
         self.lightSwitch.setIcon(lightSwitchIcon)
         self.lightSwitch.setIconSize(QtCore.QSize(64, 64))
         self.lightSwitch.setObjectName("lightSwitch")
+        self.lightSwitch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.lightWidgetLayout.addWidget(self.lightSwitch)
         self.lightWidgetLayout.setStretch(1, 1)
 

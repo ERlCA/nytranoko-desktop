@@ -37,6 +37,9 @@ class Ui_homeWindow(QtWidgets.QWidget):
         self.sidebarContainerLayout = QtWidgets.QGridLayout(self.sidebarContainer)
         self.sidebar = Sidebar(callback=self.changePage)
         self.sidebar.logout_requested.connect(self.logout_requested.emit)
+        self.sidebar.control_page_requested.connect(
+            self.controlPageRequesting
+        )  # ===============
         self.sidebarContainerLayout.addWidget(self.sidebar)
         self.homeWindowLayout.addWidget(self.sidebarContainer)
 
@@ -54,13 +57,19 @@ class Ui_homeWindow(QtWidgets.QWidget):
         self.mainWidget.setObjectName("mainWidget")
 
         self.mainWidget.addWidget(DashboardPage())  # add dashboard page
-        self.mainWidget.addWidget(ControlPage())  # add control page
+        self.controlPage = ControlPage()
+        self.mainWidget.addWidget(self.controlPage)  # add control page
 
         self.homeWindowLayout.addWidget(self.mainWidget)
 
         self.retranslateUi(homeWindow)
         self.mainWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(homeWindow)
+
+    def controlPageRequesting(self):
+        if self.mainWidget.currentIndex() != 1:
+            self.changePage(1)
+            self.controlPage.control_page_requested.emit()
 
     def changePage(self, index):
         if self.mainWidget:

@@ -6,14 +6,13 @@ from components.popUp import CloseAppWidget
 
 class Sidebar(QWidget):
     logout_requested = QtCore.pyqtSignal()
+    control_page_requested = QtCore.pyqtSignal()
 
     def __init__(self, parent=None, callback=None):
         super().__init__(parent)
         self.setup()
-
         if callback:
             self.dashboardButton.clicked.connect(lambda: callback(0))
-            self.controlButton.clicked.connect(lambda: callback(1))
 
     def setup(self):
         self.setObjectName("sidebar")
@@ -80,6 +79,7 @@ class Sidebar(QWidget):
         # dashboard and control button
         self.dashboardButton = Button("Dashboard", "dashboard")
         self.controlButton = Button("Control", "control")
+        self.controlButton.clicked.connect(self.control_page_requested.emit)
 
         self.settingsWidgetLayout.addWidget(self.dashboardButton)
         self.settingsWidgetLayout.addWidget(self.controlButton)

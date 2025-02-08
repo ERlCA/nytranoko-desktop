@@ -1,21 +1,12 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets as qtw
 from utils.loginHandle import loginHandle
-from PyQt5.QtWidgets import (
-    QLabel,
-    QPushButton,
-    QVBoxLayout,
-    QGridLayout,
-    QWidget,
-    QLineEdit,
-    QHBoxLayout,
-    QApplication,
-)
+
 import os
 from components.popUp import CloseAppWidget
 import asyncio
 
 
-class Ui_loginWindow(QWidget):
+class Ui_loginWindow(qtw.QWidget):
     login_successful = QtCore.pyqtSignal()
 
     def __init__(self):
@@ -26,9 +17,7 @@ class Ui_loginWindow(QWidget):
         loginWindow.setObjectName("loginWindow")
         # resizing
         loginWindow.resize(650, 500)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(loginWindow.sizePolicy().hasHeightForWidth())
@@ -81,7 +70,7 @@ class Ui_loginWindow(QWidget):
             "    border: none\n"
             "}\n"
             "\n"
-            "QPushButton#loginButton:disabled, QPushButton#lquitButton:disabled{\n"
+            "QPushButton#loginButton:disabled, QPushButton#quitButton:disabled{\n"
             "    background-color: #eee;\n"
             "    color: #0e273c;\n"
             "    border: none\n;"
@@ -95,21 +84,21 @@ class Ui_loginWindow(QWidget):
             "\n"
             ""
         )
-        self.loginWindowLayout = QGridLayout(loginWindow)
+        self.loginWindowLayout = qtw.QGridLayout(loginWindow)
         self.loginWindowLayout.setContentsMargins(0, 0, 0, 0)
         self.loginWindowLayout.setSpacing(0)
         self.loginWindowLayout.setObjectName("loginWindowLayout")
 
         # creating left widget of login
-        self.leftWidget = QWidget(loginWindow)
+        self.leftWidget = qtw.QWidget(loginWindow)
         self.leftWidget.setStyleSheet("color: #fff")
         self.leftWidget.setObjectName("leftWidget")
-        self.leftWidgetLayout = QVBoxLayout(self.leftWidget)
+        self.leftWidgetLayout = qtw.QVBoxLayout(self.leftWidget)
         self.leftWidgetLayout.setContentsMargins(10, 40, 10, 0)
         self.leftWidgetLayout.setSpacing(20)
         self.leftWidgetLayout.setObjectName("leftWidgetLayout")
         # title nyTranoko
-        self.titleLabel = QLabel(self.leftWidget)
+        self.titleLabel = qtw.QLabel(self.leftWidget)
         font = QtGui.QFont()
         font.setFamily("MV Boli")
         font.setPointSize(40)
@@ -121,14 +110,14 @@ class Ui_loginWindow(QWidget):
         self.titleLabel.setObjectName("titleLabel")
         self.leftWidgetLayout.addWidget(self.titleLabel)
         # description of nyTranoko
-        self.descLabel = QLabel(self.leftWidget)
+        self.descLabel = qtw.QLabel(self.leftWidget)
         font = QtGui.QFont()
         font.setFamily("Segoe UI Semibold")
         font.setPointSize(11)
         font.setBold(True)
         font.setWeight(75)
         self.descLabel.setFont(font)
-        self.descLabel.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.descLabel.setFrameShape(qtw.QFrame.NoFrame)
         self.descLabel.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
         )
@@ -136,7 +125,7 @@ class Ui_loginWindow(QWidget):
         self.descLabel.setIndent(-1)
         self.descLabel.setObjectName("descLabel")
         self.leftWidgetLayout.addWidget(self.descLabel, 0, QtCore.Qt.AlignHCenter)
-        self.label = QLabel(self.leftWidget)
+        self.label = qtw.QLabel(self.leftWidget)
         self.label.setText("")
         self.label.setObjectName("label")
         self.leftWidgetLayout.addWidget(self.label)
@@ -144,13 +133,13 @@ class Ui_loginWindow(QWidget):
         self.loginWindowLayout.addWidget(self.leftWidget, 0, 0, 1, 1)
 
         # creating form widget (right side)
-        self.formWidget = QWidget(loginWindow)
+        self.formWidget = qtw.QWidget(loginWindow)
         self.formWidget.setObjectName("formWidget")
-        self.formWidgetLayout = QVBoxLayout(self.formWidget)
+        self.formWidgetLayout = qtw.QVBoxLayout(self.formWidget)
         self.formWidgetLayout.setContentsMargins(25, 70, 25, 15)
         self.formWidgetLayout.setSpacing(10)
         self.formWidgetLayout.setObjectName("formWidgetLayout")
-        self.loginLabel = QLabel(self.formWidget)
+        self.loginLabel = qtw.QLabel(self.formWidget)
         font = QtGui.QFont()
         font.setPointSize(20)
         font.setBold(True)
@@ -161,14 +150,14 @@ class Ui_loginWindow(QWidget):
         self.loginLabel.setObjectName("loginLabel")
         self.loginLabel.setStyleSheet("color: black")
         self.formWidgetLayout.addWidget(self.loginLabel, 0, QtCore.Qt.AlignTop)
-        self.entryWidget = QWidget(self.formWidget)
+        self.entryWidget = qtw.QWidget(self.formWidget)
         self.entryWidget.setObjectName("entryWidget")
-        self.entryWidgetLayout = QVBoxLayout(self.entryWidget)
+        self.entryWidgetLayout = qtw.QVBoxLayout(self.entryWidget)
         self.entryWidgetLayout.setContentsMargins(0, 0, 0, 0)
         self.entryWidgetLayout.setSpacing(30)
         self.entryWidgetLayout.setObjectName("entryWidgetLayout")
 
-        self.usernameEntry = QLineEdit(self.entryWidget)
+        self.usernameEntry = qtw.QLineEdit(self.entryWidget)
         font = QtGui.QFont()
         font.setPointSize(10)
         self.usernameEntry.setFont(font)
@@ -176,15 +165,15 @@ class Ui_loginWindow(QWidget):
         self.usernameEntry.setObjectName("usernameEntry")
         self.entryWidgetLayout.addWidget(self.usernameEntry)
 
-        self.passwordEntry = QLineEdit(self.entryWidget)
+        self.passwordEntry = qtw.QLineEdit(self.entryWidget)
         font = QtGui.QFont()
         font.setPointSize(10)
         self.passwordEntry.setFont(font)
         self.passwordEntry.setObjectName("passwordEntry")
-        self.passwordEntry.setEchoMode(QLineEdit.Password)
+        self.passwordEntry.setEchoMode(qtw.QLineEdit.Password)
 
-        self.passwordWidget = QWidget(self.entryWidget)
-        self.passwordWidgetLayout = QHBoxLayout(self.passwordWidget)
+        self.passwordWidget = qtw.QWidget(self.entryWidget)
+        self.passwordWidgetLayout = qtw.QHBoxLayout(self.passwordWidget)
         self.passwordWidgetLayout.setContentsMargins(0, 0, 0, 0)
 
         self.openEyeIcon = QtGui.QIcon()
@@ -199,7 +188,7 @@ class Ui_loginWindow(QWidget):
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off,
         )
-        self.eyeButton = QPushButton(self.passwordWidget)
+        self.eyeButton = qtw.QPushButton(self.passwordWidget)
         self.eyeButton.setIcon(self.openEyeIcon)
         self.eyeButton.setIconSize(QtCore.QSize(16, 16))
         self.eyeButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -216,23 +205,21 @@ class Ui_loginWindow(QWidget):
 
         self.entryWidgetLayout.addWidget(self.passwordWidget)
         self.formWidgetLayout.addWidget(self.entryWidget, 0, QtCore.Qt.AlignBottom)
-        self.errorLabel = QLabel(self.formWidget)
+        self.errorLabel = qtw.QLabel(self.formWidget)
         self.errorLabel.setObjectName("errorLabel")
         self.errorLabel.setStyleSheet("color: rgb(252,252,252);")
         self.formWidgetLayout.addWidget(self.errorLabel, 0, QtCore.Qt.AlignTop)
 
         # buttons
-        self.buttonWidget = QWidget(self.formWidget)
+        self.buttonWidget = qtw.QWidget(self.formWidget)
         self.buttonWidget.setObjectName("buttonWidget")
-        self.buttonWidgetLayout = QVBoxLayout(self.buttonWidget)
+        self.buttonWidgetLayout = qtw.QVBoxLayout(self.buttonWidget)
         self.buttonWidgetLayout.setContentsMargins(0, 0, 0, 0)
         self.buttonWidgetLayout.setSpacing(20)
         self.buttonWidgetLayout.setObjectName("buttonWidgetLayout")
         # login
-        self.loginButton = QPushButton(self.buttonWidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        self.loginButton = qtw.QPushButton(self.buttonWidget)
+        sizePolicy = qtw.QSizePolicy(qtw.QSizePolicy.Minimum, qtw.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.loginButton.sizePolicy().hasHeightForWidth())
@@ -251,7 +238,7 @@ class Ui_loginWindow(QWidget):
         self.loginButton.clicked.connect(self.performLogin)  # login button event
         self.buttonWidgetLayout.addWidget(self.loginButton)
         # quit
-        self.quitButton = QPushButton(self.buttonWidget)
+        self.quitButton = qtw.QPushButton(self.buttonWidget)
         self.quitButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.quitButton.setStyleSheet(
             "QPushButton {\n"
@@ -294,6 +281,8 @@ class Ui_loginWindow(QWidget):
         self.loginButton.setDisabled(True)
         self.quitButton.setDisabled(True)
         self.loginButton.setText("En attente...")
+        self.usernameEntry.setDisabled(True)
+        self.passwordEntry.setDisabled(True)
         if await loginHandle(username, password):
             self.errorLabel.setStyleSheet("color: rgb(252,252,252)")
             self.loginButton.setText("Réussie.")
@@ -304,14 +293,17 @@ class Ui_loginWindow(QWidget):
             self.loginButton.setText("Connexion")
             self.loginButton.setDisabled(False)
         self.quitButton.setDisabled(False)
+        self.usernameEntry.setDisabled(False)
+        self.usernameEntry.setFocus()
+        self.passwordEntry.setDisabled(False)
 
     def togglePasswordVisibility(self, checked):
         if checked:
-            self.passwordEntry.setEchoMode(QLineEdit.Normal)
+            self.passwordEntry.setEchoMode(qtw.QLineEdit.Normal)
             self.eyeButton.setIcon(self.openEyeIcon)
         else:
             self.eyeButton.setIcon(self.closeEyeIcon)
-            self.passwordEntry.setEchoMode(QLineEdit.Password)
+            self.passwordEntry.setEchoMode(qtw.QLineEdit.Password)
 
     def retranslateUi(self, loginWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -338,18 +330,18 @@ class Ui_loginWindow(QWidget):
     def showCloseAppWidget(self):
         closeAppWidget = CloseAppWidget()
         result = closeAppWidget.exec_()
-        if result == QtWidgets.QDialog.Accepted:
-            QtWidgets.qApp.quit()
+        if result == qtw.QDialog.Accepted:
+            qtw.qApp.quit()
 
 
 if __name__ == "__main__":
     import sys
     from qasync import QEventLoop
 
-    app = QApplication(sys.argv)
+    app = qtw.QApplication(sys.argv)
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
-    loginWindow = QWidget()
+    loginWindow = qtw.QWidget()
     ui = Ui_loginWindow()
     ui.setupUi(loginWindow)
     loginWindow.show()

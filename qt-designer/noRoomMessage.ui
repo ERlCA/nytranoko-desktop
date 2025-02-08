@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>noRoomMessageWidget</class>
+ <widget class="QWidget" name="noRoomMessageWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>380</width>
+    <height>200</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#noRoomMessageWidget {
+	background-color: #0e273c;
+}
+
+QLabel {
+	color: #fff;
+}
+
+QPushButton {
+	color: #000;
+	padding: 20px 50px;
+	background-color: rgb(252,252,252);
+	border: 2px solid rgb(0,0,0,0);
+	letter-spacing: 2px;
+	border-radius: 20px;
+}
+QPushButton:hover {
+	background-color: rgb(255, 159, 3);
+	color: #fff;
+}
+
+QPushButton:pressed {
+	background-color: #fa8334;
+	color: #fff;
+}
+QPushButton:disabled {
+	background-color: #eee;
+	color: #0e273c;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="noRoomWidgetLayout" stretch="0,1">
+   <property name="bottomMargin">
+    <number>40</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="message">
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Aucune salle/chambre trouvée</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item alignment="Qt::AlignHCenter">
+    <widget class="QPushButton" name="refreshButton">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Actualiser</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
