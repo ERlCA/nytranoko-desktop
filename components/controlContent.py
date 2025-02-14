@@ -4,8 +4,6 @@ import json
 
 
 class ControlContent(QtWidgets.QWidget):
-    websockets_control_content_message = pyqtSignal(dict)
-
     def __init__(self, room="Room", state=None, callback=None, parent=None):
         super().__init__(parent)
         self.buttonOnIcon = QtGui.QIcon()
@@ -26,12 +24,8 @@ class ControlContent(QtWidgets.QWidget):
         )
         self.setup(room, state)
 
-        self.message = None
-
         if callback:
             self.websocketsSendMessage = callback
-
-        self.websockets_control_content_message.connect(self.webSocketsMessageHandler)
 
     def setup(self, room, state):
         self.setObjectName(room)
@@ -194,9 +188,6 @@ class ControlContent(QtWidgets.QWidget):
             self.lightIcon.setDisabled(True)
             self.lightLabel.setStyleSheet("color: #0e273c")
             self.lightSwitch.setIcon(self.buttonOffIcon)
-
-    def webSocketsMessageHandler(self, data):
-        self.message = data
 
 
 if __name__ == "__main__":
