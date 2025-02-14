@@ -1,6 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets as qtw
 from utils.loginHandle import loginHandle
-
 import os
 from components.popUp import CloseAppWidget
 import asyncio

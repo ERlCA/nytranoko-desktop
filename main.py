@@ -13,8 +13,8 @@ class MainWindow(QMainWindow):
         self.loginWindow = None
         self.homeWindow = None
 
-        self.loginInit()  # use this for production
-        # self.homeInit()  # use this in development
+        # self.loginInit()  # use this for production
+        self.homeInit()  # use this in development
 
     def loginInit(self):
         # delete homeWindow (homepage)
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
         self.showFullScreen()  # show window in fullscreen
         self.setWindowTitle("Home | nyTranoko")
         self.homeWindow = Ui_homeWindow()
-        self.homeWindow.logout_requested.connect(self.logout)
+        self.homeWindow.logout_requested_from_home.connect(self.logout)
 
         self.setCentralWidget(self.homeWindow)
         self.homeWindow.show()

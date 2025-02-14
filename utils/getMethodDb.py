@@ -24,6 +24,14 @@ class GetRooms(QThread):
                     raise Exception("Aucune chambre/salle trouvée.")
         except Exception as err:
             self.room_data_received.emit({"success": False, "data": err})
+        except httpx.TimeoutException:
+            self.room_data_received.emit(
+                {"success": False, "data": "Request timed out."}
+            )
+        except httpx.RequestError as req_err:
+            self.room_data_received.emit(
+                {"success": False, "data": f"Request error: {req_err}"}
+            )
 
 
 class GetDevices(QThread):
@@ -48,3 +56,11 @@ class GetDevices(QThread):
                     raise Exception("Aucun appareil trouvé.")
         except Exception as err:
             self.device_data_received.emit({"success": False, "data": err})
+        except httpx.TimeoutException:
+            self.room_data_received.emit(
+                {"success": False, "data": "Request timed out."}
+            )
+        except httpx.RequestError as req_err:
+            self.room_data_received.emit(
+                {"success": False, "data": f"Request error: {req_err}"}
+            )

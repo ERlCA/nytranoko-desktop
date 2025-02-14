@@ -1,31 +1,43 @@
 from PyQt5 import QtGui, QtCore, QtWidgets as qtw
 from components.controlContent import ControlContent
 from components.noRoomMessage import NoRoomMessageWidget
-from utils.getMehtodDb import GetRooms, GetDevices
+from utils.getMethodDb import GetRooms, GetDevices
+from utils.websockets import Websockets
 
 # fake json
 items = ["cuisine", "chambre", "sdf", "wer", "fdbd"]
 
 
 class ControlPage(qtw.QWidget):
-    fetching_rooms_successful = QtCore.pyqtSignal()
+    quitting_control_page = QtCore.pyqtSignal()
     control_page_requested = QtCore.pyqtSignal()
     rooms_verified = QtCore.pyqtSignal()
     devices_verified = QtCore.pyqtSignal()
 
     requesting_devices_per_room = QtCore.pyqtSignal(dict)
 
+    # connect signals
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup()
+        self.ws = Websockets()
         self.devices = None
         self.rooms = None
-        self.devicesRoom = None
+        self.devicesRoom = None  # devices per room
+        self.controlContentList = None
+        self.websocketsData = {}
+        self.new = True
 
-    def setup(self):
+        # connecting pyqtSignals
         self.rooms_verified.connect(self.performGetDevices)
         self.devices_verified.connect(self.getDevicesPerRoom)
         self.control_page_requested.connect(self.controlContentHandler)
+        self.quitting_control_page.connect(self.ws.close_)
+        self.ws.websocket_disconnected.connect(self.websocket_disconnected_handler)
+        self.ws.websocket_received_message.connect(self.websocket_message_handler)
+
+    def setup(self):
         self.mainLayout = qtw.QVBoxLayout(self)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.mainLayout.setSpacing(0)
@@ -71,14 +83,17 @@ class ControlPage(qtw.QWidget):
         self.noMessageWidget = None
 
     def controlContentHandler(self):
-        if self.devicesRoom:
-            self.updateControlContent()
-        else:
-            self.showMessageBox(
-                message="En attente pour trouver toutes les salles/chambres."
-            )
+        self.new = True
+        self.showMessageBox(
+            message="En attente pour trouver toutes les salles/chambres."
+        )
+        # print(f"control content handler : {self.new}")
+        if self.new:
+            self.ws.connect()
 
-        self.performGetRooms()
+            if self.devicesRoom:
+                self.updateControlContent()
+            self.performGetRooms()
 
     def performGetRooms(self):
         self.getRoomsWorker = GetRooms()
@@ -102,6 +117,7 @@ class ControlPage(qtw.QWidget):
         self.updateControlContent()
 
     def updateControlContent(self):
+        self.controlContentList = {}
         for i in reversed(range(self.container.layout().count())):
             child = self.container.layout().itemAt(i).widget()
             if child:
@@ -118,9 +134,9 @@ class ControlPage(qtw.QWidget):
             column = index % 3
 
             wrapper = qtw.QWidget()
-            wrapper.resize(300, 300)
-            wrapper.setMinimumSize(QtCore.QSize(300, 300))
-            wrapper.setMaximumSize(QtCore.QSize(300, 300))
+            wrapper.resize(320, 300)
+            wrapper.setMinimumSize(QtCore.QSize(320, 300))
+            wrapper.setMaximumSize(QtCore.QSize(320, 300))
             wrapperLayout = qtw.QVBoxLayout(wrapper)
             wrapperLayout.setContentsMargins(0, 0, 0, 0)
             wrapper.setStyleSheet(
@@ -132,20 +148,29 @@ class ControlPage(qtw.QWidget):
                 "}\n"
                 "\n"
             )
-            widget = ControlContent(room)
+
+            widget = ControlContent(
+                room=room,
+                state=self.websocketsData[room]["state"],
+                callback=self.ws.send_message_json,
+            )
+            self.controlContentList[room] = widget
             wrapperLayout.addWidget(widget)
 
             self.containerLayout.addWidget(
                 wrapper, row, column, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
             )
             index += 1
+        self.new = False
+
+    def websocket_disconnected_handler(self):
+        self.showMessageBox(button="Actualiser", callback=self.controlContentHandler)
 
     def verifyRooms(self, res):
         self.rooms = None
         success, data = res["success"], res["data"]
         if not success:
             self.showMessageBox(
-                message=str(data),
                 button="Actualiser",
                 callback=self.controlContentHandler,
             )
@@ -158,7 +183,6 @@ class ControlPage(qtw.QWidget):
         success, data = res["success"], res["data"]
         if not success:
             self.showMessageBox(
-                message=str(data),
                 button="Actualiser",
                 callback=self.controlContentHandler,
             )
@@ -166,7 +190,12 @@ class ControlPage(qtw.QWidget):
             self.devices = data
             self.devices_verified.emit()
 
-    def showMessageBox(self, message, button="", callback=None):
+    def showMessageBox(
+        self,
+        message="Une erreur s'est produite, Veuillez réessayer.",
+        button="",
+        callback=None,
+    ):
         self.containerLayout.setColumnStretch(1, 0)
         self.containerLayout.setColumnStretch(2, 0)
         for i in reversed(range(self.container.layout().count())):
@@ -200,6 +229,24 @@ class ControlPage(qtw.QWidget):
             self.noMessageWidget, 0, 0, QtCore.Qt.AlignCenter
         )
 
+    def websocket_message_handler(self, data):
+        room = data["room"]
+        if data["device"] == "light":
+            state = data["state"]
+            self.websocketsData[room] = data
+            if not self.new:
+                if state == "ON":
+                    self.controlContentList[room].lightSwitchToggle(True)
+                elif state == "OFF":
+                    self.controlContentList[room].lightSwitchToggle(False)
+        elif data["device"] == "temperature" and not self.new:
+            self.controlContentList[room].temperatureValue.setText(
+                f"{str(data["value"])}° C"
+            )
+
+
+if __name__ == "__main__":
+    pass
     # if len(items) <= 3:
     #     self.containerLayout.setColumnStretch(1, 2)
     #     self.containerLayout.setColumnStretch(2, 3)
@@ -229,7 +276,3 @@ class ControlPage(qtw.QWidget):
     #     self.containerLayout.addWidget(
     #         wrapper, row, column, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
     #     )
-
-
-if __name__ == "__main__":
-    pass

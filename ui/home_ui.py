@@ -5,11 +5,16 @@ from components.dashboardPage import DashboardPage
 
 
 class Ui_homeWindow(QtWidgets.QWidget):
-    logout_requested = QtCore.pyqtSignal()
+    logout_requested_from_home = QtCore.pyqtSignal()
 
     def __init__(self):
         super(Ui_homeWindow, self).__init__()
         self.setupUi(self)
+
+        # connection pyqtSignals
+        self.sidebar.logout_requested.connect(self.logout_requested_from_home.emit)
+        self.sidebar.control_page_requested.connect(self.controlPageRequesting)
+        self.sidebar.dashboard_page_requested.connect(self.dashboardPageRequesting)
 
     def setupUi(self, homeWindow):
         homeWindow.setObjectName("homeWindow")
@@ -18,6 +23,9 @@ class Ui_homeWindow(QtWidgets.QWidget):
         self.homeWindowLayout.setContentsMargins(15, 15, 0, 15)
         self.homeWindowLayout.setSpacing(10)
         self.homeWindowLayout.setObjectName("homeWindowLayout")
+        # self.resize(900, 600)
+        # self.setMinimumSize(900, 600)
+        # self.setMaximumSize(900, 600)
 
         # adding sidebar
         self.sidebarContainer = QtWidgets.QWidget(homeWindow)
@@ -35,11 +43,7 @@ class Ui_homeWindow(QtWidgets.QWidget):
             ""
         )
         self.sidebarContainerLayout = QtWidgets.QGridLayout(self.sidebarContainer)
-        self.sidebar = Sidebar(callback=self.changePage)
-        self.sidebar.logout_requested.connect(self.logout_requested.emit)
-        self.sidebar.control_page_requested.connect(
-            self.controlPageRequesting
-        )  # ===============
+        self.sidebar = Sidebar()
         self.sidebarContainerLayout.addWidget(self.sidebar)
         self.homeWindowLayout.addWidget(self.sidebarContainer)
 
@@ -65,6 +69,11 @@ class Ui_homeWindow(QtWidgets.QWidget):
         self.retranslateUi(homeWindow)
         self.mainWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(homeWindow)
+
+    def dashboardPageRequesting(self):
+        if self.mainWidget.currentIndex() != 0:
+            self.changePage(0)
+            self.controlPage.quitting_control_page.emit()
 
     def controlPageRequesting(self):
         if self.mainWidget.currentIndex() != 1:
