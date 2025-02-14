@@ -1,30 +1,30 @@
-from PyQt5 import QtGui, QtCore, QtWidgets as qtw
+from PyQt5 import QtCore, QtWidgets as qtw
 from components.noRoomMessage import NoRoomMessageWidget
+from components.header import Header
 
 
 class DashboardPage(qtw.QWidget):
+    dashboard_websocket_message = QtCore.pyqtSignal(dict)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup()
         self.maintenance_on()
 
+        # connection signal
+        self.dashboard_websocket_message.connect(self.websocketMessageHandler)
+
     def setup(self):
         self.mainLayout = qtw.QVBoxLayout(self)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainLayout.setSpacing(0)
+        self.mainLayout.setContentsMargins(0, 40, 0, 0)
+        self.mainLayout.setSpacing(20)
         self.mainLayout.setObjectName("mainLayout")
         self.mainLayout.setStretch(0, 0)
-        self.mainLayout.setStretch(0, 2)
+        self.mainLayout.setStretch(1, 2)
 
-        # title
-        self.title = qtw.QLabel("Dahsboard", self)
-        font = QtGui.QFont()
-        font.setPointSize(20)
-        font.setBold(True)
-        font.setWeight(75)
-        self.title.setFont(font)
-        self.title.setObjectName("title")
-        self.mainLayout.addWidget(self.title, 0, QtCore.Qt.AlignTop)
+        # header container
+        self.header = Header(title="Dashboard", error=False)
+        self.mainLayout.addWidget(self.header, 0, QtCore.Qt.AlignTop)
 
         # container
         self.container = qtw.QWidget(self)
@@ -66,6 +66,9 @@ class DashboardPage(qtw.QWidget):
         self.containerLayout.addWidget(
             self.noMessageWidget, 0, 0, QtCore.Qt.AlignCenter
         )
+
+    def websocketMessageHandler(self, data):
+        print(data)
 
 
 if __name__ == "__main__":

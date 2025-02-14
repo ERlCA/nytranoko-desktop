@@ -1,8 +1,9 @@
 from PyQt5 import QtGui, QtCore, QtWidgets as qtw
-from components.controlContent import ControlContent
-from components.noRoomMessage import NoRoomMessageWidget
 from utils.getMethodDb import GetRooms, GetDevices
 from utils.websockets import Websockets
+from components.controlContent import ControlContent
+from components.noRoomMessage import NoRoomMessageWidget
+from components.header import Header
 
 # fake json
 items = ["cuisine", "chambre", "sdf", "wer", "fdbd"]
@@ -13,46 +14,53 @@ class ControlPage(qtw.QWidget):
     control_page_requested = QtCore.pyqtSignal()
     rooms_verified = QtCore.pyqtSignal()
     devices_verified = QtCore.pyqtSignal()
+    retrieving_database_complete = QtCore.pyqtSignal()
+    control_page_websocket_message = QtCore.pyqtSignal(dict)
 
     requesting_devices_per_room = QtCore.pyqtSignal(dict)
 
     # connect signals
 
-    def __init__(self, parent=None):
+    def __init__(self, callback=None, parent=None):
         super().__init__(parent)
+        self.websocketSendMessage = callback if callback else None
+
         self.setup()
-        self.ws = Websockets()
+        # self.maintenance_on()
+
         self.devices = None
         self.rooms = None
         self.devicesRoom = None  # devices per room
-        self.controlContentList = None
+        self.controlContentList = None  # stores all instances of control content
         self.websocketsData = {}
         self.new = True
 
-        # connecting pyqtSignals
+        # # connecting pyqtSignals
+        self.control_page_requested.connect(self.controlContentHandler)
+        self.control_page_websocket_message.connect(self.websocketMessageHandler)
         self.rooms_verified.connect(self.performGetDevices)
         self.devices_verified.connect(self.getDevicesPerRoom)
-        self.control_page_requested.connect(self.controlContentHandler)
-        self.quitting_control_page.connect(self.ws.close_)
-        self.ws.websocket_disconnected.connect(self.websocket_disconnected_handler)
-        self.ws.websocket_received_message.connect(self.websocket_message_handler)
+        self.retrieving_database_complete.connect(self.updateControlContent)
 
     def setup(self):
         self.mainLayout = qtw.QVBoxLayout(self)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainLayout.setSpacing(0)
+        self.mainLayout.setContentsMargins(0, 40, 0, 0)
+        self.mainLayout.setSpacing(20)
         self.mainLayout.setObjectName("mainLayout")
+        self.mainLayout.setStretch(0, 0)
+        self.mainLayout.setStretch(1, 2)
 
-        # title
-        self.title = qtw.QLabel("Control", self)
-        font = QtGui.QFont()
-        font.setPointSize(20)
-        font.setBold(True)
-        font.setWeight(75)
-        self.title.setFont(font)
-        self.title.setObjectName("title")
-        self.mainLayout.addWidget(self.title)
+        self.header = Header(title="Control", error=False)
+        self.mainLayout.addWidget(self.header, 0, QtCore.Qt.AlignTop)
 
+        # container // used in maintenance mode
+        # self.container = qtw.QWidget(self)
+        # self.container.setStyleSheet("background-color: red")
+        # self.container.setObjectName("container")
+        # self.containerLayout = qtw.QGridLayout(self.container)
+        # self.mainLayout.addWidget(self.container, 1)
+
+        # comment all code below in maintenance mode
         # setting scrollArea
         self.scrollArea = qtw.QScrollArea(self)
         self.scrollArea.setFrameShape(qtw.QFrame.NoFrame)
@@ -70,6 +78,7 @@ class ControlPage(qtw.QWidget):
 
         # scrollArea needs a widget as container to its elements
         self.container = qtw.QWidget(self.scrollAreaContainer)
+        # self.container.setStyleSheet("background-color: red")
         self.container.setObjectName("container")
         self.containerLayout = qtw.QGridLayout(self.container)
         self.containerLayout.setContentsMargins(0, 0, 0, 0)
@@ -84,26 +93,46 @@ class ControlPage(qtw.QWidget):
 
     def controlContentHandler(self):
         self.new = True
-        self.showMessageBox(
-            message="En attente pour trouver toutes les salles/chambres."
-        )
-        # print(f"control content handler : {self.new}")
-        if self.new:
-            self.ws.connect()
+        self.showMessageBox(message="Veuillez patienter pendant la configuration.")
 
-            if self.devicesRoom:
-                self.updateControlContent()
-            self.performGetRooms()
+        if self.new and self.devicesRoom:
+
+            self.updateControlContent()
+        self.performGetRooms()
 
     def performGetRooms(self):
         self.getRoomsWorker = GetRooms()
         self.getRoomsWorker.room_data_received.connect(self.verifyRooms)
         self.getRoomsWorker.start()
 
+    def verifyRooms(self, res):
+        self.rooms = None
+        success, data = res["success"], res["data"]
+        if not success:
+            self.showMessageBox(
+                button="Actualiser",
+                callback=self.controlContentHandler,
+            )
+        else:
+            self.rooms = data
+            self.rooms_verified.emit()
+
     def performGetDevices(self):
         self.getDevicesWorker = GetDevices()
         self.getDevicesWorker.device_data_received.connect(self.verifyDevices)
         self.getDevicesWorker.start()
+
+    def verifyDevices(self, res):
+        self.devices = None
+        success, data = res["success"], res["data"]
+        if not success:
+            self.showMessageBox(
+                button="Actualiser",
+                callback=self.controlContentHandler,
+            )
+        else:
+            self.devices = data
+            self.devices_verified.emit()
 
     def getDevicesPerRoom(self):
         self.devicesRoom = {}
@@ -114,7 +143,7 @@ class ControlPage(qtw.QWidget):
                 for device in self.devices
                 if device["room_id"] == room["room_id"]
             ]
-        self.updateControlContent()
+        self.retrieving_database_complete.emit()
 
     def updateControlContent(self):
         self.controlContentList = {}
@@ -151,8 +180,7 @@ class ControlPage(qtw.QWidget):
 
             widget = ControlContent(
                 room=room,
-                state=self.websocketsData[room]["state"],
-                callback=self.ws.send_message_json,
+                callback=self.websocketSendMessage,
             )
             self.controlContentList[room] = widget
             wrapperLayout.addWidget(widget)
@@ -165,30 +193,6 @@ class ControlPage(qtw.QWidget):
 
     def websocket_disconnected_handler(self):
         self.showMessageBox(button="Actualiser", callback=self.controlContentHandler)
-
-    def verifyRooms(self, res):
-        self.rooms = None
-        success, data = res["success"], res["data"]
-        if not success:
-            self.showMessageBox(
-                button="Actualiser",
-                callback=self.controlContentHandler,
-            )
-        else:
-            self.rooms = data
-            self.rooms_verified.emit()
-
-    def verifyDevices(self, res):
-        self.devices = None
-        success, data = res["success"], res["data"]
-        if not success:
-            self.showMessageBox(
-                button="Actualiser",
-                callback=self.controlContentHandler,
-            )
-        else:
-            self.devices = data
-            self.devices_verified.emit()
 
     def showMessageBox(
         self,
@@ -212,10 +216,10 @@ class ControlPage(qtw.QWidget):
         self.noMessageWidget.setStyleSheet(
             """
                     QFrame#noMessageWidget {
-                        background-color: #0e273c; 
+                        background-color: #0e273c;
                         border-radius: 20px;
                         border: 2px solid rgba(0,0,0,0)
-                    } 
+                    }
                     QFrame#noMessageWidget:hover {
                         border: 2px solid rgb(255, 159, 3)
                     }
@@ -229,7 +233,7 @@ class ControlPage(qtw.QWidget):
             self.noMessageWidget, 0, 0, QtCore.Qt.AlignCenter
         )
 
-    def websocket_message_handler(self, data):
+    def websocketMessageHandler(self, data):
         room = data["room"]
         if data["device"] == "light":
             state = data["state"]
@@ -243,6 +247,40 @@ class ControlPage(qtw.QWidget):
             self.controlContentList[room].temperatureValue.setText(
                 f"{str(data["value"])}° C"
             )
+
+    def maintenance_on(self):
+        for i in reversed(range(self.container.layout().count())):
+            child = self.container.layout().itemAt(i).widget()
+            if child:
+                child.deleteLater()
+                self.container.layout().removeWidget(child)
+        self.noMessageWidget = qtw.QFrame()
+        self.noMessageWidget.resize(380, 200)
+        self.noMessageWidget.setMaximumSize(380, 200)
+        self.noMessageWidget.setMinimumSize(380, 200)
+        self.noMessageWidget.setObjectName("noMessageWidget")
+        self.noMessageWidget.setStyleSheet(
+            """
+                    QFrame#noMessageWidget {
+                        background-color: #0e273c; 
+                        border-radius: 20px;
+                        border: 2px solid rgba(0,0,0,0)
+                    } 
+                    QFrame#noMessageWidget:hover {
+                        border: 2px solid rgb(255, 159, 3)
+                    }
+                """
+        )
+        self.noMessageWidgetLayout = qtw.QVBoxLayout(self.noMessageWidget)
+        self.noMessageWidgetLayout.addWidget(
+            NoRoomMessageWidget(
+                message="Cette fonctionnalité n'est pas encore disponible.",
+            ),
+            0,
+        )
+        self.containerLayout.addWidget(
+            self.noMessageWidget, 0, 0, QtCore.Qt.AlignCenter
+        )
 
 
 if __name__ == "__main__":
