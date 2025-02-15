@@ -3,7 +3,6 @@ from utils.getMethodDb import GetRooms, GetDevices
 from utils.websockets import Websockets
 from components.controlContent import ControlContent
 from components.noRoomMessage import NoRoomMessageWidget
-from components.header import Header
 
 # fake json
 items = ["cuisine", "chambre", "sdf", "wer", "fdbd"]
@@ -16,8 +15,9 @@ class ControlPage(qtw.QWidget):
     devices_verified = QtCore.pyqtSignal()
     retrieving_database_complete = QtCore.pyqtSignal()
     control_page_websocket_message = QtCore.pyqtSignal(dict)
-
+    control_content_rendered = QtCore.pyqtSignal(dict)
     requesting_devices_per_room = QtCore.pyqtSignal(dict)
+    control_page_switch_toggled = QtCore.pyqtSignal(dict)
 
     # connect signals
 
@@ -44,7 +44,7 @@ class ControlPage(qtw.QWidget):
 
     def setup(self):
         self.mainLayout = qtw.QVBoxLayout(self)
-        self.mainLayout.setContentsMargins(0, 40, 0, 0)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.mainLayout.setSpacing(20)
         self.mainLayout.setObjectName("mainLayout")
 
@@ -88,10 +88,9 @@ class ControlPage(qtw.QWidget):
         self.noMessageWidget = None
 
     def controlContentHandler(self):
-        self.new = True
         self.showMessageBox(message="Veuillez patienter pendant la configuration.")
 
-        if self.new and self.devicesRoom:
+        if self.devicesRoom:
 
             self.updateControlContent()
         self.performGetRooms()
@@ -178,6 +177,10 @@ class ControlPage(qtw.QWidget):
                 room=room,
                 callback=self.websocketSendMessage,
             )
+            widget.control_content_switch_toggled.connect(
+                self.control_page_switch_toggled.emit
+            )
+
             self.controlContentList[room] = widget
             wrapperLayout.addWidget(widget)
 
@@ -186,6 +189,7 @@ class ControlPage(qtw.QWidget):
             )
             index += 1
         self.new = False
+        self.control_content_rendered.emit(self.controlContentList)
 
     def websocket_disconnected_handler(self):
         self.showMessageBox(button="Actualiser", callback=self.controlContentHandler)
@@ -281,32 +285,3 @@ class ControlPage(qtw.QWidget):
 
 if __name__ == "__main__":
     pass
-    # if len(items) <= 3:
-    #     self.containerLayout.setColumnStretch(1, 2)
-    #     self.containerLayout.setColumnStretch(2, 3)
-
-    # for index, item in enumerate(items):
-    #     row = index // 3
-    #     column = index % 3
-
-    #     wrapper = qtw.QWidget()
-    #     wrapper.resize(300, 300)
-    #     wrapper.setMinimumSize(QtCore.QSize(300, 300))
-    #     wrapper.setMaximumSize(QtCore.QSize(300, 300))
-    #     wrapperLayout = qtw.QVBoxLayout(wrapper)
-    #     wrapperLayout.setContentsMargins(0, 0, 0, 0)
-    #     wrapper.setStyleSheet(
-    #         "QWidget {\n"
-    #         "    border-radius: 20px;\n"
-    #         "    background-color: rgb(48, 108, 149);\n"
-    #         "    color: #fff;\n"
-    #         "    border: none;\n"
-    #         "}\n"
-    #         "\n"
-    #     )
-    #     widget = ControlContent(item)
-    #     wrapperLayout.addWidget(widget)
-
-    #     self.containerLayout.addWidget(
-    #         wrapper, row, column, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
-    #     )

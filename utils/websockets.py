@@ -43,8 +43,8 @@ class Websockets(QThread):
 
         url = "ws://192.168.1.100:4000/api"
         self.connectingState = True
-        self.ws.open(QUrl(url))
         self.connectingTimeout.start(5000)
+        self.ws.open(QUrl(url))
 
     def close_(self):
         self.connectingState = False
@@ -53,21 +53,22 @@ class Websockets(QThread):
 
     def on_connected(self):
         self.connectingState = False
+        self.connectingTimeout.stop()
         self.reconnectTimer.stop()
         print("Websocket : connected to the server")
         self.websoket_connected.emit()
 
     def on_error(self, error):
+        return
         print(f"WebSocket error: {error}")
 
     def on_disconnected(self):
         self.connectingState = False
-        if not self.reconnectTimer.isActive():
-            self.reconnectTimer.start()
-        print("Disconnected from WebSocket server.")
-
         try:
-            self.connect()
+            if not self.reconnectTimer.isActive():
+                self.reconnectTimer.start()
+            print("Disconnected from WebSocket server.")
+
             self.websocket_disconnected.emit()
         except:
             return

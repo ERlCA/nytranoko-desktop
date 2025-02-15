@@ -4,6 +4,8 @@ import json
 
 
 class ControlContent(QtWidgets.QWidget):
+    control_content_switch_toggled = pyqtSignal(dict)
+
     def __init__(self, room="Room", state=None, callback=None, parent=None):
         super().__init__(parent)
         self.buttonOnIcon = QtGui.QIcon()
@@ -170,13 +172,16 @@ class ControlContent(QtWidgets.QWidget):
         self.lightSwitchToggle(self.lightSwitch.isChecked())
 
     def lightSwitchHandler(self, checked):
-        data = {}
+        data = None
+        value = {}
         room = self.objectName()
         self.lightSwitchToggle(checked)
         if checked:
-            data = json.dumps({"room": room, "device": "light", "state": "ON"})
+            value = {"room": room, "device": "light", "state": "ON"}
         else:
-            data = json.dumps({"room": room, "device": "light", "state": "OFF"})
+            value = {"room": room, "device": "light", "state": "OFF"}
+        data = json.dumps(value)
+        self.control_content_switch_toggled.emit(value)
         self.websocketsSendMessage(data)
 
     def lightSwitchToggle(self, checked):

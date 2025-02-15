@@ -42,7 +42,7 @@ class Header(qtw.QFrame):
         self.messageBox.setObjectName("messageBoxWidget")
         self.messageBox.setStyleSheet(
             """
-              background-color: #0e273c;
+              background-color: rgb(48, 108, 149);
               padding: 5px 10px;
               border-radius: 20px
             """

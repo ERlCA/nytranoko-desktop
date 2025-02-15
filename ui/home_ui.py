@@ -3,6 +3,7 @@ from components.sidebar import Sidebar
 from components.controlPage import ControlPage
 from components.dashboardPage import DashboardPage
 from components.header import Header
+from components.notificationBox import NotificationBox
 from utils.websockets import Websockets
 
 
@@ -15,17 +16,23 @@ class Ui_homeWindow(qtw.QWidget):
         self.ws.connect()
 
         self.temperatureData = {}
+        self.lightData = {}
+        self.lightOnList = []
 
         self.setupUi()
 
         # connection pyqtSignals
-        # self.ws.websoket_connected.connect(self.websocketConnectedHandler)
-        # self.ws.websocket_disconnected.connect(self.websocketDisconnectedHandler)
-        # self.ws.websocket_received_message.connect(self.websocketMessageHandler)
+        self.ws.websoket_connected.connect(self.websocketConnectedHandler)
+        self.ws.websocket_disconnected.connect(self.websocketDisconnectedHandler)
+        self.ws.websocket_received_message.connect(self.websocketMessageHandler)
 
         self.sidebar.logout_requested.connect(self.logout_requested_from_home.emit)
         self.sidebar.control_page_requested.connect(self.controlPageRequesting)
         self.sidebar.dashboard_page_requested.connect(self.dashboardPageRequesting)
+        self.controlPage.control_content_rendered.connect(self.controlContentUpdate)
+        self.controlPage.control_page_switch_toggled.connect(
+            self.lightSwitchToggledHandler
+        )
 
     def setupUi(self):
         self.setObjectName("self")
@@ -67,12 +74,24 @@ class Ui_homeWindow(qtw.QWidget):
         # self.mainWidget.setStyleSheet("QFrame{background-color: red};\n")
         self.mainWidgetLayout = qtw.QVBoxLayout(self.mainWidget)
         self.mainWidgetLayout.setContentsMargins(0, 40, 0, 0)
-        self.mainWidgetLayout.setSpacing(0)
+        self.mainWidgetLayout.setSpacing(5)
         self.homeWindowLayout.addWidget(self.mainWidget, 1)
 
         # header
         self.header = Header(title="Dashboard", error=True)
         self.mainWidgetLayout.addWidget(self.header, 0, QtCore.Qt.AlignTop)
+
+        # notification box
+        self.notificationBox = NotificationBox(self)
+        self.notificationBox.setStyleSheet(
+            """
+            QFrame {
+                background-color:#0e273c;
+                border-radius: 20px;
+            }
+            """
+        )
+        self.mainWidgetLayout.addWidget(self.notificationBox, 0, QtCore.Qt.AlignTop)
 
         self.stackedWidget = qtw.QStackedWidget(self.mainWidget)
         # self.stackedWidget.setStyleSheet("background-color:red")
@@ -91,7 +110,6 @@ class Ui_homeWindow(qtw.QWidget):
         if self.stackedWidget.currentIndex() != 0:
             self.changePage(0)
             self.header.title.setText("Dashboard")
-            self.controlPage.quitting_control_page.emit()
 
     def controlPageRequesting(self):
         if self.stackedWidget.currentIndex() != 1:
@@ -112,11 +130,42 @@ class Ui_homeWindow(qtw.QWidget):
 
     def websocketMessageHandler(self, data):
         room, device = data["room"], data["device"]
+        if device == "light":
+            self.lightData[room] = data
+            if data["state"] == "ON":
+                if not room in self.lightOnList:
+                    self.lightOnList.append(room)
+            else:
+                if room in self.lightOnList:
+                    self.lightOnList.pop(self.lightOnList.index(room))
+            self.notificationBox.update_light_count.emit(len(self.lightOnList))
+
         if device == "light" or device == "temperature":
-            if self.mainWidget.currentIndex() == 0:
+            if self.stackedWidget.currentIndex() == 0:
                 self.dashboardPage.dashboard_websocket_message.emit(data)
-            elif self.mainWidget.currentIndex() == 1:
+            elif self.stackedWidget.currentIndex() == 1:
+
                 self.controlPage.control_page_websocket_message.emit(data)
+
+    def lightSwitchToggledHandler(self, data):
+        room = data["room"]
+        self.lightData[room] = data
+        if data["state"] == "ON":
+            if not room in self.lightOnList:
+                self.lightOnList.append(room)
+        else:
+            if room in self.lightOnList:
+                self.lightOnList.pop(self.lightOnList.index(room))
+        self.notificationBox.update_light_count.emit(len(self.lightOnList))
+
+    def controlContentUpdate(self, data):
+        # NOTE - debugging
+        for room, component in data.items():
+            print(f"debugging {room}")
+            if self.lightData[room]["state"] == "ON":
+                component.lightSwitchToggle(True)
+            else:
+                component.lightSwitchToggle(False)
 
 
 if __name__ == "__main__":
