@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QTimer
 
 
 class NotificationBox(qtw.QFrame):
@@ -13,8 +13,38 @@ class NotificationBox(qtw.QFrame):
         self.personIcon = self.loadIcon("motion-sensor")
         self.lightIcon = self.loadIcon("lamp")
         self.homeIcon = self.loadIcon("home-safe")
+        self.circle = self.loadIcon("circle-red")
+        self.homeRedIcon = self.loadIcon("home-not-safe")
         super().__init__(parent)
 
+        self.messageList = {
+            "safe": (
+                self.homeIcon,
+                'Vous êtes en sécurité avec l\'application "nyTranoko".',
+            ),
+            "unsafe": (
+                self.homeRedIcon,
+                "Vous n'êtes pas protégé, le système d'alarme est désactivé.",
+            ),
+            "flame": (self.dangerIcon, "Attention, risque d'incendie."),
+            "gas": (self.dangerIcon, "Attention, risque d'une fuite de gaz."),
+            "pir": (self.circle, "Une présence a été détectée."),
+        }
+
+        self.pirMessageTimer = QTimer()
+        self.pirMessageTimer.setInterval(1000)
+        self.pirMessageTimer.timeout.connect(self.pirMessageHandler)
+        self.pirIconTimer = QTimer()
+        self.pirIconTimer.setInterval(7000)
+        self.pirIconBlink = 1
+        self.maxBlink = 10
+        self.pirIconTimer.timeout.connect(self.pirIconHandler)
+
+        self.dangerTimer = QTimer()
+        self.dangerTimer.setInterval(1000)
+        self.dangerTimer.timeout.connect(self.dangerHandler)
+
+        self.activeSensor = set()
         self.setup()
 
         # connectiong signal
@@ -98,9 +128,8 @@ class NotificationBox(qtw.QFrame):
         self.messageIcon.setIconSize(QtCore.QSize(56, 56))
         self.messageBoxLayout.addWidget(self.messageIcon, 0, QtCore.Qt.AlignRight)
         #
-        self.messageLabel = qtw.QLabel(
-            "Ceci est une notisafjlkasjflasjfasfication", self.messageBox
-        )
+        self.messageLabel = qtw.QLabel(self.messageList["safe"][1], self.messageBox)
+        self.messageLabel.setObjectName("safe")
         self.messageLabel.setStyleSheet("color: #fff")
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -113,6 +142,107 @@ class NotificationBox(qtw.QFrame):
         else:
             self.light.setDisabled(False)
         self.lightCount.setText(str(count))
+
+    def alarmActivate(self, isAlarmOn):
+        mode = self.messageLabel.objectName()
+        if not mode in ["flame", "gas", "pir"]:
+            self.updateMessageNotification("safe")
+        if not isAlarmOn:
+            self.pirMessageTimer.stop()
+            self.dangerTimer.stop()
+            self.updateMessageNotification("unsafe")
+
+    def updateSensorNotification(
+        self, device, sensorValue, isAlarmOn=True
+    ):  # NOTE - alarm is on
+
+        mode = self.messageLabel.objectName()
+        if device == "pir":
+            if self.pirIconTimer.isActive():
+                self.pirIconTimer.stop()
+            if self.pirMessageTimer.isActive():
+                self.pirMessageTimer.stop()
+
+            if sensorValue == 0:
+                self.pirSensor.setDisabled(True)
+            else:
+                self.pirSensor.setDisabled(False)
+                self.pirIconTimer.start()
+                if mode in ["safe", "pir"]:
+                    self.updateMessageNotification("pir")
+                    self.pirMessageTimer.start()
+
+        elif device == "flame" or device == "gas":
+            if sensorValue == 0:
+                if device in self.activeSensor:
+                    self.activeSensor.remove(device)
+
+                if device == "flame":
+                    self.flame.setDisabled(True)
+                elif device == "gas":
+                    self.gas.setDisabled(True)
+            else:
+                if device not in self.activeSensor:
+                    self.activeSensor.add(device)
+
+                if device == "flame":
+                    self.flame.setDisabled(False)
+                elif device == "gas":
+                    self.gas.setDisabled(False)
+
+            if not isAlarmOn:
+                return
+
+            if len(self.activeSensor) == 2:
+                self.pirMessageTimer.stop()
+                if not self.dangerTimer.isActive():
+                    self.dangerTimer.start()
+            elif len(self.activeSensor) == 1:
+                self.pirMessageTimer.stop()
+                if self.dangerTimer.isActive():
+                    self.dangerTimer.stop()
+                if "flame" in self.activeSensor:
+                    self.updateMessageNotification("flame")
+                elif "gas" in self.activeSensor:
+                    self.updateMessageNotification("gas")
+
+            elif len(self.activeSensor) == 0:
+                if not self.pirIconTimer.isActive():
+                    self.updateMessageNotification("safe")
+                if self.dangerTimer.isActive():
+                    self.dangerTimer.stop()
+
+    def dangerHandler(self):
+        if self.messageLabel.objectName() != "flame":
+            self.updateMessageNotification("flame")
+        elif self.messageLabel.objectName() != "gas":
+            self.updateMessageNotification("gas")
+
+    def updateMessageNotification(self, name):
+        self.messageLabel.setObjectName(name)
+        self.messageLabel.setText(self.messageList[name][1])
+        self.messageIcon.setIcon(self.messageList[name][0])
+
+    def pirIconHandler(self):
+        self.pirIconBlink += 1
+        if self.pirIconBlink >= 1:
+            self.pirSensor.setDisabled(True)
+            self.pirIconTimer.stop()
+
+    def pirMessageHandler(self):
+        # print("maxBlink : ", self.maxBlink)  # NOTE - debugging
+        self.maxBlink -= 1
+        mode = self.messageLabel.objectName()
+        if mode in ["flame", "gas", "unsafe"] or self.maxBlink <= 0:
+            self.pirMessageTimer.stop()
+            return
+        if not self.pirMessageTimer.isActive() and self.maxBlink > 0:
+            self.pirMessageTimer.start()
+
+        if mode == "safe":
+            self.updateMessageNotification("pir")
+        elif mode == "pir":
+            self.updateMessageNotification("safe")
 
     def loadIcon(self, iconName):
         icon = QtGui.QIcon()

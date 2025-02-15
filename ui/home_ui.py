@@ -5,6 +5,7 @@ from components.dashboardPage import DashboardPage
 from components.header import Header
 from components.notificationBox import NotificationBox
 from utils.websockets import Websockets
+import datetime
 
 
 class Ui_homeWindow(qtw.QWidget):
@@ -18,6 +19,10 @@ class Ui_homeWindow(qtw.QWidget):
         self.temperatureData = {}
         self.lightData = {}
         self.lightOnList = []
+        self.flameData = []
+        self.gasData = []
+        self.pirData = []
+        self.isAlarmOn = True
 
         self.setupUi()
 
@@ -129,8 +134,11 @@ class Ui_homeWindow(qtw.QWidget):
         self.header.updateHeader(error=False)
 
     def websocketMessageHandler(self, data):
-        room, device = data["room"], data["device"]
+        maxSize = 30
+        device = data["device"]
+        # NOTE - handling "light" data and updating light counter
         if device == "light":
+            room = data["room"]
             self.lightData[room] = data
             if data["state"] == "ON":
                 if not room in self.lightOnList:
@@ -140,12 +148,59 @@ class Ui_homeWindow(qtw.QWidget):
                     self.lightOnList.pop(self.lightOnList.index(room))
             self.notificationBox.update_light_count.emit(len(self.lightOnList))
 
+        # NOTE - handling temperature data
+        if device == "temperature":
+            room = data["room"]
+            date = datetime.datetime.now()
+            value = data["value"]
+            values = [value, date]
+            if room not in self.temperatureData:
+                self.temperatureData[room] = []
+
+            if len(self.temperatureData[room]) >= maxSize:
+                self.temperatureData[room].pop(0)
+            self.temperatureData[room].append(values)
+
+        # NOTE - giving data to actice widget( dashboard or control)
         if device == "light" or device == "temperature":
             if self.stackedWidget.currentIndex() == 0:
                 self.dashboardPage.dashboard_websocket_message.emit(data)
             elif self.stackedWidget.currentIndex() == 1:
 
                 self.controlPage.control_page_websocket_message.emit(data)
+
+        # NOTE - handling Pir/Flame/Gas sensors data
+        else:
+            # NOTE - debugging, delete all print when everything is working
+            sensorValue = data["value"]
+            print("device : ", device, " | value : ", sensorValue)
+            if "alarm" in data:
+                self.isAlarmOn = data["alarm"]
+                self.notificationBox.alarmActivate(self.isAlarmOn)
+
+            if device == "pir" and len(data) > 3:
+                return
+
+            if device == "pir":
+                self.notificationBox.pirIconBlink = 0
+                self.notificationBox.maxBlink = 10
+                if len(self.pirData) >= maxSize:
+                    self.pirData.pop(0)
+                self.pirData.append({sensorValue, data["date"]})
+
+            elif device == "flame":
+                if len(self.flameData) >= maxSize:
+                    self.flameData.pop(0)
+                self.flameData.append({sensorValue, data["date"]})
+
+            elif device == "gas":
+                if len(self.gasData) >= maxSize:
+                    self.gasData.pop(0)
+                self.gasData.append({sensorValue, data["date"]})
+
+            self.notificationBox.updateSensorNotification(
+                device, sensorValue, self.isAlarmOn
+            )
 
     def lightSwitchToggledHandler(self, data):
         room = data["room"]
@@ -159,9 +214,7 @@ class Ui_homeWindow(qtw.QWidget):
         self.notificationBox.update_light_count.emit(len(self.lightOnList))
 
     def controlContentUpdate(self, data):
-        # NOTE - debugging
         for room, component in data.items():
-            print(f"debugging {room}")
             if self.lightData[room]["state"] == "ON":
                 component.lightSwitchToggle(True)
             else:
