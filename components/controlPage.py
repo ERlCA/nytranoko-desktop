@@ -47,12 +47,8 @@ class ControlPage(qtw.QWidget):
         self.mainLayout.setContentsMargins(0, 40, 0, 0)
         self.mainLayout.setSpacing(20)
         self.mainLayout.setObjectName("mainLayout")
-        self.mainLayout.setStretch(0, 0)
-        self.mainLayout.setStretch(1, 2)
 
-        self.header = Header(title="Control", error=False)
-        self.mainLayout.addWidget(self.header, 0, QtCore.Qt.AlignTop)
-
+        # NOTE - The code below may not work, need update
         # container // used in maintenance mode
         # self.container = qtw.QWidget(self)
         # self.container.setStyleSheet("background-color: red")

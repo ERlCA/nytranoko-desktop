@@ -1,11 +1,12 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets as qtw
 from components.sidebar import Sidebar
 from components.controlPage import ControlPage
 from components.dashboardPage import DashboardPage
+from components.header import Header
 from utils.websockets import Websockets
 
 
-class Ui_homeWindow(QtWidgets.QWidget):
+class Ui_homeWindow(qtw.QWidget):
     logout_requested_from_home = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
@@ -16,12 +17,11 @@ class Ui_homeWindow(QtWidgets.QWidget):
         self.temperatureData = {}
 
         self.setupUi()
-        self.websocketLastState = None
 
         # connection pyqtSignals
-        self.ws.websoket_connected.connect(self.websocketConnectedHandler)
-        self.ws.websocket_disconnected.connect(self.websocketDisconnectedHandler)
-        self.ws.websocket_received_message.connect(self.websocketMessageHandler)
+        # self.ws.websoket_connected.connect(self.websocketConnectedHandler)
+        # self.ws.websocket_disconnected.connect(self.websocketDisconnectedHandler)
+        # self.ws.websocket_received_message.connect(self.websocketMessageHandler)
 
         self.sidebar.logout_requested.connect(self.logout_requested_from_home.emit)
         self.sidebar.control_page_requested.connect(self.controlPageRequesting)
@@ -32,7 +32,7 @@ class Ui_homeWindow(QtWidgets.QWidget):
         self.setStyleSheet("background-color: rgb(250, 250, 250)")
         self.setWindowTitle("Home")
 
-        self.homeWindowLayout = QtWidgets.QHBoxLayout(self)
+        self.homeWindowLayout = qtw.QHBoxLayout(self)
         self.homeWindowLayout.setContentsMargins(10, 10, 10, 10)
         self.homeWindowLayout.setSpacing(10)
         self.homeWindowLayout.setObjectName("homeWindowLayout")
@@ -41,7 +41,7 @@ class Ui_homeWindow(QtWidgets.QWidget):
         # self.setMaximumSize(900, 600)
 
         # adding sidebar
-        self.sidebarContainer = QtWidgets.QWidget(self)
+        self.sidebarContainer = qtw.QWidget(self)
         self.sidebarContainer.setStyleSheet(
             "QWidget {\n"
             "    background-color: #0e273c;\n"
@@ -55,63 +55,60 @@ class Ui_homeWindow(QtWidgets.QWidget):
             "\n"
             ""
         )
-        self.sidebarContainerLayout = QtWidgets.QGridLayout(self.sidebarContainer)
+        self.sidebarContainerLayout = qtw.QGridLayout(self.sidebarContainer)
         self.sidebar = Sidebar()
         self.sidebarContainerLayout.addWidget(self.sidebar)
-        self.homeWindowLayout.addWidget(self.sidebarContainer)
+        self.homeWindowLayout.addWidget(self.sidebarContainer, 0, QtCore.Qt.AlignLeft)
 
         # ========================================================
         # adding main page
-        self.mainWidget = QtWidgets.QStackedWidget(self)
-        self.mainWidget.setStyleSheet(
-            "QStackedWidget > QWidget > QLabel {\n"
-            "    background-color: rgba(0, 0, 0, 0);\n"
-            "    color: #0e273c;\n"
-            "}\n"
-            ""
-        )
+        self.mainWidget = qtw.QFrame(self)
         self.mainWidget.setObjectName("mainWidget")
+        # self.mainWidget.setStyleSheet("QFrame{background-color: red};\n")
+        self.mainWidgetLayout = qtw.QVBoxLayout(self.mainWidget)
+        self.mainWidgetLayout.setContentsMargins(0, 40, 0, 0)
+        self.mainWidgetLayout.setSpacing(0)
+        self.homeWindowLayout.addWidget(self.mainWidget, 1)
+
+        # header
+        self.header = Header(title="Dashboard", error=True)
+        self.mainWidgetLayout.addWidget(self.header, 0, QtCore.Qt.AlignTop)
+
+        self.stackedWidget = qtw.QStackedWidget(self.mainWidget)
+        # self.stackedWidget.setStyleSheet("background-color:red")
+        self.mainWidgetLayout.addWidget(
+            self.stackedWidget,
+        )
 
         self.dashboardPage = DashboardPage()
-        self.mainWidget.addWidget(self.dashboardPage)  # add dashboard page
+        self.stackedWidget.addWidget(self.dashboardPage)  # add dashboard page
         self.controlPage = ControlPage(callback=self.ws.send_message_json)
-        self.mainWidget.addWidget(self.controlPage)  # add control page
+        self.stackedWidget.addWidget(self.controlPage)  # add control page
 
-        self.homeWindowLayout.addWidget(self.mainWidget)
-
-        self.mainWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(0)
 
     def dashboardPageRequesting(self):
-        if self.mainWidget.currentIndex() != 0:
+        if self.stackedWidget.currentIndex() != 0:
             self.changePage(0)
+            self.header.title.setText("Dashboard")
             self.controlPage.quitting_control_page.emit()
 
     def controlPageRequesting(self):
-        if self.mainWidget.currentIndex() != 1:
+        if self.stackedWidget.currentIndex() != 1:
+            self.header.title.setText("Control")
             self.changePage(1)
             self.controlPage.control_page_requested.emit()
 
     def changePage(self, index):
-        if self.mainWidget:
-            self.mainWidget.setCurrentIndex(index)
-
-    def homepage_requested_handler(self):
-        pass
+        if self.stackedWidget:
+            self.stackedWidget.setCurrentIndex(index)
 
     # websocket event handler
     def websocketDisconnectedHandler(self):
-        if self.websocketLastState == "disconnected":
-            return
-        self.controlPage.header.updateHeader(True)
-        self.dashboardPage.header.updateHeader(True)
-        self.websocketLastState = "disconnected"
+        self.header.updateHeader(error=True)
 
     def websocketConnectedHandler(self):
-        if self.websocketLastState == "connected":
-            return
-        self.controlPage.header.updateHeader(False)
-        self.dashboardPage.header.updateHeader(False)
-        self.websocketLastState = "connected"
+        self.header.updateHeader(error=False)
 
     def websocketMessageHandler(self, data):
         room, device = data["room"], data["device"]

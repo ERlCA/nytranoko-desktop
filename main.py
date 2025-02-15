@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         self.homeWindow = None
 
         # self.loginInit()  # use this for production
-        self.homeInit()  # use this in development
+        self.homeInit()  # use this in dev
 
     def loginInit(self):
         # delete homeWindow (homepage)
