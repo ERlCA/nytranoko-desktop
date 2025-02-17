@@ -45,7 +45,7 @@ class ControlPage(qtw.QWidget):
     def setup(self):
         self.mainLayout = qtw.QVBoxLayout(self)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainLayout.setSpacing(20)
+        self.mainLayout.setSpacing(0)
         self.mainLayout.setObjectName("mainLayout")
 
         # NOTE - The code below may not work, need update

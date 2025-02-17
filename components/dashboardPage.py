@@ -1,115 +1,188 @@
 from PyQt5 import QtCore, QtWidgets as qtw
-from components.noRoomMessage import NoRoomMessageWidget
-from components.notificationBox import NotificationBox
+from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis, QDateTimeAxis
+from PyQt5.QtGui import QPainter
+from PyQt5.QtCore import QDateTime
 
 
 class DashboardPage(qtw.QWidget):
-    dashboard_websocket_message = QtCore.pyqtSignal(dict)
-
     def __init__(self, parent=None):
         super().__init__(parent)
-        # self.setup()
-        # self.maintenance_on()
+        self.setup()
+
+        self.tempChart = {}
+        self.tempCuisine = []
+        self.tempCoucher = []
+        self.pirData = list()
+        self.flameData = list()
+        self.gasData = list()
+
+        self.temperatureChart()
 
         # connection signal
-        # self.dashboard_websocket_message.connect(self.websocketMessageHandler)
 
     def setup(self):
         pass
-        # self.mainLayout = qtw.QVBoxLayout(self)
-        # self.mainLayout.setContentsMargins(0, 40, 0, 0)
-        # self.mainLayout.setSpacing(20)
-        # self.mainLayout.setObjectName("mainLayout")
-        # self.mainLayout.setStretch(0, 0)
-        # self.mainLayout.setStretch(1, 2)
+        self.mainLayout = qtw.QVBoxLayout(self)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.mainLayout.setSpacing(20)
+        self.mainLayout.setObjectName("mainLayout")
 
-        # # container
-        # self.container = qtw.QWidget(self)
-        # self.container.setStyleSheet("background-color:red")
-        # self.container.setObjectName("container")
-        # # self.containerLayout = qtw.QGridLayout(self.container) # used in maintenance
+        # setting scrollArea
+        self.scrollArea = qtw.QScrollArea(self)
+        self.scrollArea.setFrameShape(qtw.QFrame.NoFrame)
+        self.scrollArea.setLineWidth(0)
+        self.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setAlignment(QtCore.Qt.AlignCenter)
+        self.scrollArea.setObjectName("scrollArea")
 
-        # # used when the dashboard is functionning
-        # self.containerLayout = qtw.QVBoxLayout(self.container)
-        # self.containerLayout.setContentsMargins(0, 0, 0, 0)
-        # self.containerLayout.setSpacing(0)
+        self.scrollAreaContainer = qtw.QWidget()
+        self.scrollAreaContainer.setObjectName("scrollAreaContainer")
+        self.scrollAreaContainerLayout = qtw.QVBoxLayout(self.scrollAreaContainer)
+        self.scrollAreaContainerLayout.setContentsMargins(0, 0, 0, 0)
+        self.scrollAreaContainerLayout.setSpacing(0)
+        self.scrollAreaContainerLayout.setObjectName("scrollAreaContainerLayout")
 
-        # # notification box
-        # self.notificationBox = NotificationBox(self)
-        # # self.notificationBox.setStyleSheet("background-color: blue")
-        # # self.notificationBoxLayout = qtw.QHBoxLayout(self.notificationBox)
-        # # self.containerLayout.addWidget(self.notificationBox, 0, QtCore.Qt.AlignTop)
+        # scrollArea needs a widget as container to its elements
+        self.container = qtw.QWidget(self.scrollAreaContainer)
+        self.container.setObjectName("container")
+        self.containerLayout = qtw.QVBoxLayout(self.container)
+        self.containerLayout.setContentsMargins(0, 0, 0, 0)
+        self.containerLayout.setSpacing(10)
+        self.containerLayout.setObjectName("containerLayout")
 
-        # # # Icon box
-        # # self.iconBox = qtw.QWidget(self.notificationBox)
-        # # self.iconBox.setStyleSheet("background-color: green")
-        # # self.iconBoxLayout = qtw.QHBoxLayout(self.iconBox)
-        # # self.notificationBoxLayout.addWidget(self.iconBox, 0, QtCore.Qt.AlignLeft)
+        self.scrollAreaContainerLayout.addWidget(self.container)
+        self.scrollArea.setWidget(self.scrollAreaContainer)
+        self.mainLayout.addWidget(self.scrollArea)
 
-        # # # icon for different notification
-        # # self.flame = qtw.QPushButton(self.iconBox)
-        # # self.flame.setText("")
-        # # self.flame.setIcon(self.flameIcon)
-        # # self.flame.setIconSize(QtCore.QSize(56, 56))
-        # # self.iconBoxLayout.addWidget(self.flame)
-        # # #
-        # # self.gas = qtw.QPushButton(self.iconBox)
-        # # self.gas.setText("")
-        # # self.gas.setIcon(self.gasIcon)
-        # # self.gas.setIconSize(QtCore.QSize(56, 56))
-        # # self.iconBoxLayout.addWidget(self.gas)
-        # # #
-        # # self.pirSensor = qtw.QPushButton(self.iconBox)
-        # # self.pirSensor.setText("")
-        # # self.pirSensor.setIcon(self.personIcon)
-        # # self.pirSensor.setIconSize(QtCore.QSize(56, 56))
-        # # self.iconBoxLayout.addWidget(self.pirSensor)
+    def temperatureDataUpdate(self, data):
+        if len(data["cuisine"]) != len(self.tempCuisine):
+            if len(self.tempCuisine) >= 30:
+                self.tempCuisine[0]
+            self.tempCuisine.append(data["cuisine"][-1])
 
-        # # # notification message box
-        # # self.messageBox = qtw.QWidget(self.notificationBox)
-        # # self.messageBox.setStyleSheet("background-color: orange")
-        # # self.messageBoxLayout = qtw.QWidget(self.messageBox)
-        # # self.notificationBoxLayout.addWidget(self.messageBox, 0)
+        elif len(data["chambre_à_coucher"]) != len(self.tempCoucher):
+            if len(self.tempCoucher) >= 30:
+                self.tempCoucher[0]
+            self.tempCoucher.append(data["chambre_à_coucher"][-1])
 
-        # self.mainLayout.addWidget(self.container, 1)
+        self.tempChartUpdate()
 
-    # def maintenance_on(self):
-    #     for i in reversed(range(self.container.layout().count())):
-    #         child = self.container.layout().itemAt(i).widget()
-    #         if child:
-    #             child.deleteLater()
-    #             self.container.layout().removeWidget(child)
-    #     self.noMessageWidget = qtw.QFrame()
-    #     self.noMessageWidget.resize(380, 200)
-    #     self.noMessageWidget.setMaximumSize(380, 200)
-    #     self.noMessageWidget.setMinimumSize(380, 200)
-    #     self.noMessageWidget.setObjectName("noMessageWidget")
-    #     self.noMessageWidget.setStyleSheet(
-    #         """
-    #                 QFrame#noMessageWidget {
-    #                     background-color: #0e273c;
-    #                     border-radius: 20px;
-    #                     border: 2px solid rgba(0,0,0,0)
-    #                 }
-    #                 QFrame#noMessageWidget:hover {
-    #                     border: 2px solid rgb(255, 159, 3)
-    #                 }
-    #             """
-    #     )
-    #     self.noMessageWidgetLayout = qtw.QVBoxLayout(self.noMessageWidget)
-    #     self.noMessageWidgetLayout.addWidget(
-    #         NoRoomMessageWidget(
-    #             message="Cette fonctionnalité n'est pas encore disponible.",
-    #         ),
-    #         0,
-    #     )
-    #     self.containerLayout.addWidget(
-    #         self.noMessageWidget, 0, 0, QtCore.Qt.AlignCenter
-    #     )
+    def pirDataUpdate(self, data):
+        if len(data) != len(self.pirData):
+            self.pirData = data
 
-    # def websocketMessageHandler(self, data):
-    #     print(data)
+    def flameDataUpdate(self, data):
+        if len(data) != len(self.flameData):
+            self.flameData = data
+
+    def gasDataUpdate(self, data):
+        if len(data) != len(self.gasData):
+            self.gasData = data
+
+    def temperatureChart(self):
+        # chart container
+        self.temperatureChartWidget = qtw.QWidget(self.container)
+        self.temperatureChartWidget.setFixedHeight(500)
+        self.temperatureChartLayout = qtw.QVBoxLayout(self.temperatureChartWidget)
+        self.temperatureChartLayout.setContentsMargins(0, 0, 0, 0)
+        self.temperatureChartLayout.setSpacing(0)
+        self.containerLayout.addWidget(self.temperatureChartWidget)
+        # Create a QChart
+        self.chartTemperature = QChart()
+        self.chartTemperature.setTitle("Données des capteurs de température.")
+
+        # Create a QLineSeries
+        self.seriesTemperatureCuisine = QLineSeries()
+        self.seriesTemperatureCuisine.setName("Cuisine")
+        for temp, timestamp in self.tempCuisine:
+            dt = QDateTime(timestamp)
+            self.seriesTemperatureCuisine.append(dt.toMSecsSinceEpoch(), temp)
+        self.chartTemperature.addSeries(self.seriesTemperatureCuisine)
+
+        self.seriesTemperatureCoucher = QLineSeries()
+        self.seriesTemperatureCoucher.setName("Chambre à coucher")
+        for temp, timestamp in self.tempCoucher:
+            dt = QDateTime(timestamp)
+            self.seriesTemperatureCoucher.append(dt.toMSecsSinceEpoch(), temp)
+        self.chartTemperature.addSeries(self.seriesTemperatureCoucher)
+
+        # Create X-Axis (time)
+        self.tempAxisX = QDateTimeAxis()
+        self.tempAxisX.setFormat("hh:mm:ss")
+        self.tempAxisX.setTitleText("Temps")
+        self.tempAxisX.setTickCount(10)
+        # Create Y-Axis (temperature)
+        self.tempAxisY = QValueAxis()
+        self.tempAxisY.setTitleText("Temperature (°C)")
+        self.tempAxisY.setLabelFormat("%.1f")  # Format to 1 decimal place
+        self.tempAxisY.setTickCount(10)  # Number of labels on Y-axis
+        # Attach axes to chart
+        self.chartTemperature.addAxis(self.tempAxisX, QtCore.Qt.AlignBottom)
+        self.chartTemperature.addAxis(self.tempAxisY, QtCore.Qt.AlignLeft)
+
+        # Attach axes to serires
+        self.seriesTemperatureCoucher.attachAxis(self.tempAxisX)
+        self.seriesTemperatureCoucher.attachAxis(self.tempAxisY)
+        self.seriesTemperatureCuisine.attachAxis(self.tempAxisX)
+        self.seriesTemperatureCuisine.attachAxis(self.tempAxisY)
+
+        # Create a QChartView
+        self.chartTemperatureView = QChartView(self.chartTemperature)
+        self.chartTemperatureView.setRenderHint(QPainter.Antialiasing)
+
+        self.tempChartUpdate()
+
+        # Add the QChartView to the layout
+        self.temperatureChartLayout.addWidget(self.chartTemperatureView)
+
+    def tempChartUpdate(self):
+        if not self.tempCuisine and not self.tempCoucher:
+            return
+
+        if self.tempCuisine:
+            min_time_cuisine = min(self.tempCuisine, key=lambda x: x[1])[1]
+            max_time_cuisine = max(self.tempCuisine, key=lambda x: x[1])[1]
+        else:
+            min_time_cuisine = max_time_cuisine = None
+
+        if self.tempCoucher:
+            min_time_coucher = min(self.tempCoucher, key=lambda x: x[1])[1]
+            max_time_coucher = max(self.tempCoucher, key=lambda x: x[1])[1]
+        else:
+            min_time_coucher = max_time_coucher = None
+
+        min_time = min(filter(None, [min_time_cuisine, min_time_coucher]))
+        max_time = max(filter(None, [max_time_cuisine, max_time_coucher]))
+
+        # Y axis
+        if self.tempCuisine and self.tempCoucher:
+            min_temp = min(
+                min(self.tempCuisine, key=lambda x: x[0])[0],
+                min(self.tempCoucher, key=lambda x: x[0])[0],
+            )
+            max_temp = max(
+                max(self.tempCuisine, key=lambda x: x[0])[0],
+                max(self.tempCoucher, key=lambda x: x[0])[0],
+            )
+        elif self.tempCuisine:
+            min_temp = min(self.tempCuisine, key=lambda x: x[0])[0]
+            max_temp = max(self.tempCuisine, key=lambda x: x[0])[0]
+        elif self.tempCoucher:
+            min_temp = min(self.tempCoucher, key=lambda x: x[0])[0]
+            max_temp = max(self.tempCoucher, key=lambda x: x[0])[0]
+        else:
+            min_temp = max_temp = 0
+
+        self.tempAxisY.setMin(min_temp - 1)  # Add some padding
+        self.tempAxisY.setMax(max_temp + 1)
+
+        self.tempAxisX.setMin(QDateTime(min_time))
+        self.tempAxisX.setMax(QDateTime(max_time))
+
+        self.chartTemperatureView.update()
 
 
-# if __name__ == "__main__":
-# pass
+if __name__ == "__main__":
+    pass

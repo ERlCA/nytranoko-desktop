@@ -10,18 +10,23 @@ import datetime
 
 class Ui_homeWindow(qtw.QWidget):
     logout_requested_from_home = QtCore.pyqtSignal()
+    temperature_data_received = QtCore.pyqtSignal()
+    flame_data_received = QtCore.pyqtSignal()
+    pir_data_received = QtCore.pyqtSignal()
+    gas_data_received = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ws = Websockets()
         self.ws.connect()
 
-        self.temperatureData = {}
-        self.lightData = {}
-        self.lightOnList = []
-        self.flameData = []
-        self.gasData = []
-        self.pirData = []
+        self.tempCuisine = []
+        self.tempCoucher = []
+        self.lightData = dict()
+        self.lightOnList = list()
+        self.flameData = list()
+        self.gasData = list()
+        self.pirData = list()
         self.isAlarmOn = True
 
         self.setupUi()
@@ -37,6 +42,21 @@ class Ui_homeWindow(qtw.QWidget):
         self.controlPage.control_content_rendered.connect(self.controlContentUpdate)
         self.controlPage.control_page_switch_toggled.connect(
             self.lightSwitchToggledHandler
+        )
+        #
+        self.temperature_data_received.connect(
+            lambda: self.dashboardPage.temperatureDataUpdate(
+                {"chambre_à_coucher": self.tempCoucher, "cuisine": self.tempCuisine}
+            )
+        )
+        self.pir_data_received.connect(
+            lambda: self.dashboardPage.pirDataUpdate(self.pirData)
+        )
+        self.flame_data_received.connect(
+            lambda: self.dashboardPage.flameDataUpdate(self.flameData)
+        )
+        self.gas_data_received.connect(
+            lambda: self.dashboardPage.gasDataUpdate(self.gasData)
         )
 
     def setupUi(self):
@@ -154,18 +174,22 @@ class Ui_homeWindow(qtw.QWidget):
             date = datetime.datetime.now()
             value = data["value"]
             values = [value, date]
-            if room not in self.temperatureData:
-                self.temperatureData[room] = []
+            if room == "cuisine":
+                self.tempCuisine.append(values)
+            if room == "chambre_à_coucher":
+                self.tempCoucher.append(values)
+            if len(self.tempCuisine) >= maxSize:
+                self.tempCuisine.pop(0)
+            if len(self.tempCoucher) >= maxSize:
+                self.tempCoucher.pop(0)
 
-            if len(self.temperatureData[room]) >= maxSize:
-                self.temperatureData[room].pop(0)
-            self.temperatureData[room].append(values)
+            self.temperature_data_received.emit()
 
         # NOTE - giving data to actice widget( dashboard or control)
         if device == "light" or device == "temperature":
-            if self.stackedWidget.currentIndex() == 0:
-                self.dashboardPage.dashboard_websocket_message.emit(data)
-            elif self.stackedWidget.currentIndex() == 1:
+            # if self.stackedWidget.currentIndex() == 0:
+            #     self.dashboardPage.dashboard_websocket_message.emit(data)
+            if self.stackedWidget.currentIndex() == 1:
 
                 self.controlPage.control_page_websocket_message.emit(data)
 
@@ -186,18 +210,19 @@ class Ui_homeWindow(qtw.QWidget):
                 if len(self.pirData) >= maxSize:
                     self.pirData.pop(0)
                 self.pirData.append({sensorValue, data["date"]})
-
+                self.pir_data_received.emit()
             elif device == "flame":
                 self.notificationBox.flameMaxBlink = 10
                 if len(self.flameData) >= maxSize:
                     self.flameData.pop(0)
                 self.flameData.append({sensorValue, data["date"]})
-
+                self.flame_data_received.emit()
             elif device == "gas":
                 self.gasMaxBlink = 10
                 if len(self.gasData) >= maxSize:
                     self.gasData.pop(0)
                 self.gasData.append({sensorValue, data["date"]})
+                self.gas_data_received.emit()
 
             self.notificationBox.updateSensorNotification(
                 device, sensorValue, self.isAlarmOn

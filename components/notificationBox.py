@@ -32,29 +32,17 @@ class NotificationBox(qtw.QFrame):
         }
 
         iconTimer = 7000
-        self.pirMessageTimer = QTimer()
-        self.pirMessageTimer.setInterval(1000)
-        self.pirMessageTimer.timeout.connect(self.pirMessageHandler)
         self.pirIconTimer = QTimer()
         self.pirIconTimer.setInterval(iconTimer)
-        self.pirMaxBlink = 10
         self.pirIconTimer.timeout.connect(self.pirIconHandler)
 
-        self.flameMessageTimer = QTimer()
-        self.flameMessageTimer.setInterval(1000)
-        self.flameMessageTimer.timeout.connect(self.flameMessageHandler)
         self.flameIconTimer = QTimer()
         self.flameIconTimer.setInterval(iconTimer)
         self.flameIconTimer.timeout.connect(self.flameIconHandler)
-        self.flameMaxBlink = 10
 
-        self.gasMessageTimer = QTimer()
-        self.gasMessageTimer.setInterval(1000)
-        self.gasMessageTimer.timeout.connect(self.gasMessageHandler)
         self.gasIconTimer = QTimer()
         self.gasIconTimer.setInterval(iconTimer)
         self.gasIconTimer.timeout.connect(self.gasIconHandler)
-        self.gasMaxBlink = 10
 
         self.dangerMessageTimer = QTimer()
         self.dangerMessageTimer.setInterval(1000)
@@ -180,8 +168,6 @@ class NotificationBox(qtw.QFrame):
                 self.pirState = sensorValue
                 if self.pirIconTimer.isActive():
                     self.pirIconTimer.stop()
-                if self.pirMessageTimer.isActive():
-                    self.pirMessageTimer.stop()
 
                 self.pirSensor.setDisabled(False)
                 self.pirIconTimer.start()
@@ -192,8 +178,6 @@ class NotificationBox(qtw.QFrame):
                 self.flameState = sensorValue
                 if self.flameIconTimer.isActive():
                     self.flameIconTimer.stop()
-                if self.flameMessageTimer.isActive():
-                    self.flameMessageTimer.stop()
 
                 if mode == "safe":
                     self.updateMessageNotification("flame")
@@ -203,8 +187,6 @@ class NotificationBox(qtw.QFrame):
                 self.gasState = sensorValue
                 if self.gasIconTimer.isActive():
                     self.gasIconTimer.stop()
-                if self.gasMessageTimer.isActive():
-                    self.gasMessageTimer.stop()
                 if mode == "safe":
                     self.updateMessageNotification("gas")
                 self.gas.setDisabled(False)
@@ -229,7 +211,8 @@ class NotificationBox(qtw.QFrame):
         if "gas" in self.activeSensor:
             gas = self.activeSensor["gas"]
         # print(f"pir : {pir} | flame : {flame} | gas : {gas} | count : {count}")
-
+        if count == 0:
+            self.dangerMessageTimer.stop()
         if count == 1:
             if mode != "safe":
                 self.updateMessageNotification("safe")
