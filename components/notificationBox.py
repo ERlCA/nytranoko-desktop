@@ -31,20 +31,37 @@ class NotificationBox(qtw.QFrame):
             "pir": (self.circle, "Une présence a été détectée."),
         }
 
+        iconTimer = 7000
         self.pirMessageTimer = QTimer()
         self.pirMessageTimer.setInterval(1000)
         self.pirMessageTimer.timeout.connect(self.pirMessageHandler)
         self.pirIconTimer = QTimer()
-        self.pirIconTimer.setInterval(7000)
-        self.pirIconBlink = 1
-        self.maxBlink = 10
+        self.pirIconTimer.setInterval(iconTimer)
+        self.pirMaxBlink = 10
         self.pirIconTimer.timeout.connect(self.pirIconHandler)
 
-        self.dangerTimer = QTimer()
-        self.dangerTimer.setInterval(1000)
-        self.dangerTimer.timeout.connect(self.dangerHandler)
+        self.flameMessageTimer = QTimer()
+        self.flameMessageTimer.setInterval(1000)
+        self.flameMessageTimer.timeout.connect(self.flameMessageHandler)
+        self.flameIconTimer = QTimer()
+        self.flameIconTimer.setInterval(iconTimer)
+        self.flameIconTimer.timeout.connect(self.flameIconHandler)
+        self.flameMaxBlink = 10
 
-        self.activeSensor = set()
+        self.gasMessageTimer = QTimer()
+        self.gasMessageTimer.setInterval(1000)
+        self.gasMessageTimer.timeout.connect(self.gasMessageHandler)
+        self.gasIconTimer = QTimer()
+        self.gasIconTimer.setInterval(iconTimer)
+        self.gasIconTimer.timeout.connect(self.gasIconHandler)
+        self.gasMaxBlink = 10
+
+        self.dangerMessageTimer = QTimer()
+        self.dangerMessageTimer.setInterval(1000)
+        self.dangerMessageTimer.timeout.connect(self.dangerMessageHandler)
+        self.dangerBlink = 10
+
+        self.activeSensor = dict()
         self.setup()
 
         # connectiong signal
@@ -148,101 +165,138 @@ class NotificationBox(qtw.QFrame):
         if not mode in ["flame", "gas", "pir"]:
             self.updateMessageNotification("safe")
         if not isAlarmOn:
-            self.pirMessageTimer.stop()
-            self.dangerTimer.stop()
+            self.dangerMessageTimer.stop()
             self.updateMessageNotification("unsafe")
 
     def updateSensorNotification(
         self, device, sensorValue, isAlarmOn=True
-    ):  # NOTE - alarm is on
+    ):  # NOTE - alarm is on, and only dealing with values > 0
 
         mode = self.messageLabel.objectName()
-        if device == "pir":
-            if self.pirIconTimer.isActive():
-                self.pirIconTimer.stop()
-            if self.pirMessageTimer.isActive():
-                self.pirMessageTimer.stop()
+        if sensorValue > 0:
+            self.activeSensor[device] = sensorValue
 
-            if sensorValue == 0:
-                self.pirSensor.setDisabled(True)
-            else:
+            if device == "pir":
+                self.pirState = sensorValue
+                if self.pirIconTimer.isActive():
+                    self.pirIconTimer.stop()
+                if self.pirMessageTimer.isActive():
+                    self.pirMessageTimer.stop()
+
                 self.pirSensor.setDisabled(False)
                 self.pirIconTimer.start()
-                if mode in ["safe", "pir"]:
+                if mode == "safe":
                     self.updateMessageNotification("pir")
-                    self.pirMessageTimer.start()
 
-        elif device == "flame" or device == "gas":
-            if sensorValue == 0:
-                if device in self.activeSensor:
-                    self.activeSensor.remove(device)
+            elif device == "flame":
+                self.flameState = sensorValue
+                if self.flameIconTimer.isActive():
+                    self.flameIconTimer.stop()
+                if self.flameMessageTimer.isActive():
+                    self.flameMessageTimer.stop()
 
-                if device == "flame":
-                    self.flame.setDisabled(True)
-                elif device == "gas":
-                    self.gas.setDisabled(True)
-            else:
-                if device not in self.activeSensor:
-                    self.activeSensor.add(device)
-
-                if device == "flame":
-                    self.flame.setDisabled(False)
-                elif device == "gas":
-                    self.gas.setDisabled(False)
+                if mode == "safe":
+                    self.updateMessageNotification("flame")
+                self.flame.setDisabled(False)
+                self.flameIconTimer.start()
+            if device == "gas":
+                self.gasState = sensorValue
+                if self.gasIconTimer.isActive():
+                    self.gasIconTimer.stop()
+                if self.gasMessageTimer.isActive():
+                    self.gasMessageTimer.stop()
+                if mode == "safe":
+                    self.updateMessageNotification("gas")
+                self.gas.setDisabled(False)
+                self.gasIconTimer.start()
 
             if not isAlarmOn:
+                self.updateMessageNotification("unsafe")
                 return
 
-            if len(self.activeSensor) == 2:
-                self.pirMessageTimer.stop()
-                if not self.dangerTimer.isActive():
-                    self.dangerTimer.start()
-            elif len(self.activeSensor) == 1:
-                self.pirMessageTimer.stop()
-                if self.dangerTimer.isActive():
-                    self.dangerTimer.stop()
-                if "flame" in self.activeSensor:
+            self.dangerMessageTimer.start()
+
+    def dangerMessageHandler(self):
+        mode = self.messageLabel.objectName()
+        pir = 0
+        flame = 0
+        gas = 0
+        count = len([x for x in self.activeSensor.values() if x == 1])
+        if "pir" in self.activeSensor:
+            pir = self.activeSensor["pir"]
+        if "flame" in self.activeSensor:
+            flame = self.activeSensor["flame"]
+        if "gas" in self.activeSensor:
+            gas = self.activeSensor["gas"]
+        # print(f"pir : {pir} | flame : {flame} | gas : {gas} | count : {count}")
+
+        if count == 1:
+            if mode != "safe":
+                self.updateMessageNotification("safe")
+            if mode == "safe":
+                if pir == 1:
+                    self.updateMessageNotification("pir")
+                elif flame == 1:
                     self.updateMessageNotification("flame")
-                elif "gas" in self.activeSensor:
+                elif gas == 1:
                     self.updateMessageNotification("gas")
-
-            elif len(self.activeSensor) == 0:
-                if not self.pirIconTimer.isActive():
+                else:
                     self.updateMessageNotification("safe")
-                if self.dangerTimer.isActive():
-                    self.dangerTimer.stop()
+        elif count == 2:
+            if pir == 0:
+                if mode != "gas":
+                    self.updateMessageNotification("gas")
+                elif mode != "flame":
+                    self.updateMessageNotification("flame")
+            elif flame == 0:
+                if mode != "gas":
+                    self.updateMessageNotification("gas")
+                elif mode != "pir":
+                    self.updateMessageNotification("pir")
+            elif gas == 0:
+                if mode != "flame":
+                    self.updateMessageNotification("flame")
+                elif mode != "pir":
+                    self.updateMessageNotification("pir")
+            else:
+                self.updateMessageNotification("safe")
+        elif count == 3:
+            if mode != "gas":
+                self.updateMessageNotification("gas")
+            elif mode != "flame":
+                self.updateMessageNotification("flame")
 
-    def dangerHandler(self):
-        if self.messageLabel.objectName() != "flame":
-            self.updateMessageNotification("flame")
-        elif self.messageLabel.objectName() != "gas":
-            self.updateMessageNotification("gas")
+    def flameIconHandler(self):
+        self.flame.setDisabled(True)
+        self.flameIconTimer.stop()
+        self.activeSensor["flame"] = 0
+        if self.messageLabel.objectName() == "unsafe":
+            return
+        if not (self.pirIconTimer.isActive() and self.gasIconTimer.isActive()):
+            self.updateMessageNotification("safe")
+
+    def gasIconHandler(self):
+        self.gas.setDisabled(True)
+        self.gasIconTimer.stop()
+        self.activeSensor["gas"] = 0
+        if self.messageLabel.objectName() == "unsafe":
+            return
+        if not (self.pirIconTimer.isActive() and self.flameIconTimer.isActive()):
+            self.updateMessageNotification("safe")
+
+    def pirIconHandler(self):
+        self.pirSensor.setDisabled(True)
+        self.pirIconTimer.stop()
+        self.activeSensor["pir"] = 0
+        if self.messageLabel.objectName() == "unsafe":
+            return
+        if not (self.gasIconTimer.isActive() and self.flameIconTimer.isActive()):
+            self.updateMessageNotification("safe")
 
     def updateMessageNotification(self, name):
         self.messageLabel.setObjectName(name)
         self.messageLabel.setText(self.messageList[name][1])
         self.messageIcon.setIcon(self.messageList[name][0])
-
-    def pirIconHandler(self):
-        self.pirIconBlink += 1
-        if self.pirIconBlink >= 1:
-            self.pirSensor.setDisabled(True)
-            self.pirIconTimer.stop()
-
-    def pirMessageHandler(self):
-        # print("maxBlink : ", self.maxBlink)  # NOTE - debugging
-        self.maxBlink -= 1
-        mode = self.messageLabel.objectName()
-        if mode in ["flame", "gas", "unsafe"] or self.maxBlink <= 0:
-            self.pirMessageTimer.stop()
-            return
-        if not self.pirMessageTimer.isActive() and self.maxBlink > 0:
-            self.pirMessageTimer.start()
-
-        if mode == "safe":
-            self.updateMessageNotification("pir")
-        elif mode == "pir":
-            self.updateMessageNotification("safe")
 
     def loadIcon(self, iconName):
         icon = QtGui.QIcon()

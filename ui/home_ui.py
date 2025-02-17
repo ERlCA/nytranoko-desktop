@@ -173,7 +173,7 @@ class Ui_homeWindow(qtw.QWidget):
         else:
             # NOTE - debugging, delete all print when everything is working
             sensorValue = data["value"]
-            print("device : ", device, " | value : ", sensorValue)
+            # print("device : ", device, " | value : ", sensorValue)
             if "alarm" in data:
                 self.isAlarmOn = data["alarm"]
                 self.notificationBox.alarmActivate(self.isAlarmOn)
@@ -182,18 +182,19 @@ class Ui_homeWindow(qtw.QWidget):
                 return
 
             if device == "pir":
-                self.notificationBox.pirIconBlink = 0
-                self.notificationBox.maxBlink = 10
+                self.notificationBox.pirMaxBlink = 10
                 if len(self.pirData) >= maxSize:
                     self.pirData.pop(0)
                 self.pirData.append({sensorValue, data["date"]})
 
             elif device == "flame":
+                self.notificationBox.flameMaxBlink = 10
                 if len(self.flameData) >= maxSize:
                     self.flameData.pop(0)
                 self.flameData.append({sensorValue, data["date"]})
 
             elif device == "gas":
+                self.gasMaxBlink = 10
                 if len(self.gasData) >= maxSize:
                     self.gasData.pop(0)
                 self.gasData.append({sensorValue, data["date"]})
